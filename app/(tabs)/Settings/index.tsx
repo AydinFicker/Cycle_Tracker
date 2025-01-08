@@ -3,7 +3,6 @@ import {
   View,
   useColorScheme,
   Text,
-  TouchableOpacity,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { DefaultButton } from "@/components/buttons/DefaultButton";

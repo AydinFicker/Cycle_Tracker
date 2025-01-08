@@ -15,33 +15,73 @@ export default function StartScreen() {
         <View style={styles.flowersContainer}>
           <Ionicons
             name="flower"
+            size={175}
+            color="#808080"
+            style={[
+              styles.flower,
+              { opacity: 0.35, top: 0, left: -90 },
+              { color: theme.black },
+            ]}
+          />
+          <Ionicons
+            name="flower"
+            size={120}
+            color="#808080"
+            style={[
+              styles.flower,
+              { opacity: 0.25, top: 50, left: 75 },
+              { color: theme.black },
+            ]}
+          />
+          <Ionicons
+            name="flower"
+            size={45}
+            color="#808080"
+            style={[
+              styles.flower,
+              { opacity: 0.1, top: 160, left: 45 },
+              { color: theme.black },
+            ]}
+          />
+          <Ionicons
+            name="flower"
+            size={80}
+            color="#808080"
+            style={[
+              styles.flower,
+              { opacity: 0.15, top: 180, left: 160 },
+              { color: theme.black },
+            ]}
+          />
+          <Ionicons
+            name="flower"
             size={50}
             color="#808080"
-            style={{ opacity: 0.8 }}
+            style={[
+              styles.flower,
+              { opacity: 0.05, top: 250, left: 80 },
+              { color: theme.black },
+            ]}
           />
           <Ionicons
             name="flower"
-            size={40}
+            size={80}
             color="#808080"
-            style={{ opacity: 0.6 }}
+            style={[
+              styles.flower,
+              { opacity: 0.15, top: 200, left: -30 },
+              { color: theme.black },
+            ]}
           />
           <Ionicons
             name="flower"
-            size={30}
+            size={50}
             color="#808080"
-            style={{ opacity: 0.4 }}
-          />
-          <Ionicons
-            name="flower"
-            size={25}
-            color="#808080"
-            style={{ opacity: 0.3 }}
-          />
-          <Ionicons
-            name="flower"
-            size={20}
-            color="#808080"
-            style={{ opacity: 0.2 }}
+            style={[
+              styles.flower,
+              { opacity: 1, top: 275, left: 255 },
+              { color: theme.red },
+            ]}
           />
         </View>
 
@@ -73,8 +113,10 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
     right: 20,
-    flexDirection: "row",
-    justifyContent: "space-around",
+    height: 200,
+  },
+  flower: {
+    position: "absolute",
   },
   contentContainer: {
     flex: 1,

@@ -83,7 +83,7 @@ export default function StartScreen() {
         </View>
 
         <DefaultButton
-          onPress={() => router.push("/(tabs)")}
+          onPress={() => router.push("/onboarding/cycle-info")}
           style={styles.button}
           defaultColor={theme.yellow}
           defaultTextColor={theme.white}

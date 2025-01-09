@@ -1,69 +1,60 @@
-import { StyleSheet, View, Text } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import { DefaultButton } from "@/components/buttons/DefaultButton";
 import { useState } from "react";
 import { Colors } from "@/constants/Colors";
-import { useTheme } from "@/contexts/ThemeContext";
 import { router } from "expo-router";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
 
 export default function CycleInfoScreen() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const { theme } = useTheme();
-  const colors = Colors[theme];
+  const colorScheme = useColorScheme() ?? "light";
+  const theme = Colors[colorScheme];
 
   const handleContinue = () => {
     if (selectedOption) {
-      // Save the selection to storage/state management
-      // Navigate to next onboarding screen or home
       router.push("/(tabs)");
     }
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: colors.background }]}
-      >
-        <View style={styles.content}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Is your cycle regular?
-          </Text>
+    <ThemedView style={styles.container}>
+      <View style={styles.content}>
+        <ThemedText type="title" style={styles.title}>
+          Is your cycle regular?
+        </ThemedText>
 
-          <DefaultButton
-            onPress={() => setSelectedOption("regular")}
-            isSelected={selectedOption === "regular"}
-          >
-            My cycle is regular
-          </DefaultButton>
+        <DefaultButton
+          onPress={() => setSelectedOption("regular")}
+          isSelected={selectedOption === "regular"}
+        >
+          My cycle is regular
+        </DefaultButton>
 
-          <DefaultButton
-            onPress={() => setSelectedOption("irregular")}
-            isSelected={selectedOption === "irregular"}
-          >
-            My cycle is irregular
-          </DefaultButton>
+        <DefaultButton
+          onPress={() => setSelectedOption("irregular")}
+          isSelected={selectedOption === "irregular"}
+        >
+          My cycle is irregular
+        </DefaultButton>
 
-          <DefaultButton
-            onPress={() => setSelectedOption("unsure")}
-            isSelected={selectedOption === "unsure"}
-          >
-            I am not sure
-          </DefaultButton>
+        <DefaultButton
+          onPress={() => setSelectedOption("unsure")}
+          isSelected={selectedOption === "unsure"}
+        >
+          I am not sure
+        </DefaultButton>
 
-          <DefaultButton
-            onPress={handleContinue}
-            style={[
-              styles.continueButton,
-              { opacity: selectedOption ? 1 : 0.5 },
-            ]}
-            defaultColor={colors.yellow}
-            defaultTextColor={colors.white}
-          >
-            Continue
-          </DefaultButton>
-        </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+        <DefaultButton
+          onPress={handleContinue}
+          style={[styles.continueButton, { opacity: selectedOption ? 1 : 0.5 }]}
+          defaultColor={theme.yellow}
+          defaultTextColor={theme.white}
+        >
+          Continue
+        </DefaultButton>
+      </View>
+    </ThemedView>
   );
 }
 
@@ -77,8 +68,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 30,
     textAlign: "center",
   },

@@ -8,7 +8,13 @@ export default function OnboardingLayout() {
         <Stack.Screen
           name="cycle-info"
           options={{
-            title: "Cycle Information",
+            title: "Cycle Information Onboarding",
+          }}
+        />
+        <Stack.Screen
+          name="symptoms-info"
+          options={{
+            title: "Cycle Information Onboarding",
           }}
         />
       </Stack>

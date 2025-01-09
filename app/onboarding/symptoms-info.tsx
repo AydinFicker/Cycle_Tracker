@@ -6,6 +6,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { MultiSelectButton } from "@/components/buttons/MultiSelectButton";
 import { DefaultButton } from "@/components/buttons/DefaultButton";
+import { LoadingTopBar } from "@/components/LoadingTopBar";
 
 const SYMPTOMS = [
   "Painful cramps",
@@ -36,6 +37,7 @@ export default function SymptomsInfoScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <LoadingTopBar progress={50} style={styles.progressBar} />
       <View style={styles.content}>
         <ThemedText type="title" style={styles.title}>
           Do you experience any of the following symptoms during your period?
@@ -67,6 +69,10 @@ export default function SymptomsInfoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  progressBar: {
+    margin: 20,
+    marginTop: 40,
   },
   content: {
     flex: 1,

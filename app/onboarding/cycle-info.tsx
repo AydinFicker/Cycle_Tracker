@@ -5,6 +5,7 @@ import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
+import { LoadingTopBar } from "@/components/LoadingTopBar";
 
 export default function CycleInfoScreen() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -19,6 +20,8 @@ export default function CycleInfoScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <LoadingTopBar progress={25} style={styles.progressBar} />
+
       <View style={styles.content}>
         <ThemedText type="title" style={styles.title}>
           Is your cycle regular?
@@ -61,6 +64,10 @@ export default function CycleInfoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  progressBar: {
+    margin: 20,
+    marginTop: 40,
   },
   content: {
     flex: 1,

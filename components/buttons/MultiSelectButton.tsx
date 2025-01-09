@@ -6,10 +6,10 @@ import {
   StyleProp,
   ViewStyle,
   View,
+  useColorScheme,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "react-native";
 
 interface MultiSelectButtonProps {
   onPress: () => void;

@@ -4,9 +4,9 @@ import {
   TouchableOpacity,
   View,
   useColorScheme,
+  Modal,
   Text,
 } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -25,6 +25,12 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
+  const handleOptionPress = (option: string) => {
+    console.log("Option selected:", option);
+    onSelect(option);
+    setIsOpen(false);
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -34,7 +40,7 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
             backgroundColor: theme.middlegrey,
           },
         ]}
-        onPress={() => setIsOpen(!isOpen)}
+        onPress={() => setIsOpen(true)}
       >
         <Text style={styles.text}>{value || "Select your situation"}</Text>
         <Ionicons
@@ -44,35 +50,38 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
         />
       </TouchableOpacity>
 
-      {isOpen && (
-        <View
-          style={[
-            styles.dropdown,
-            {
-              backgroundColor: theme.middlegrey,
-            },
-          ]}
+      <Modal
+        visible={isOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsOpen(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setIsOpen(false)}
         >
-          {options.map((option, index) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.option,
-                index !== options.length - 1 && {
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.background,
-                },
-              ]}
-              onPress={() => {
-                onSelect(option);
-                setIsOpen(false);
-              }}
-            >
-              <Text style={styles.text}>{option}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+          <View style={styles.modalContent}>
+            {options.map((option, index) => (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.option,
+                  {
+                    backgroundColor: theme.middlegrey,
+                    borderBottomWidth: index !== options.length - 1 ? 1 : 0,
+                    borderBottomColor: theme.background,
+                  },
+                ]}
+                onPress={() => handleOptionPress(option)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.optionText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -81,8 +90,7 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     marginVertical: 8,
-    position: "relative",
-    zIndex: 1,
+    marginTop: "75%",
   },
   button: {
     padding: 16,
@@ -94,22 +102,25 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#000",
   },
-  dropdown: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    width: "100%",
+    maxHeight: "80%",
     borderRadius: 15,
-    marginTop: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    overflow: "hidden",
   },
   option: {
     padding: 16,
+  },
+  optionText: {
+    fontSize: 16,
+    fontWeight: "500",
   },
 });

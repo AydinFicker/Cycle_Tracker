@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { LoadingTopBar } from "@/components/LoadingTopBar";
+import { SkipButton } from "@/components/onboarding/skip";
 
 export default function CycleInfoScreen() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export default function CycleInfoScreen() {
   return (
     <ThemedView style={styles.container}>
       <LoadingTopBar progress={25} style={styles.progressBar} />
-
+      <SkipButton href="/onboarding/symptoms-info" />
       <View style={styles.content}>
         <ThemedText type="title" style={styles.title}>
           Is your cycle regular?

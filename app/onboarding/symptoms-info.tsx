@@ -7,6 +7,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { MultiSelectButton } from "@/components/buttons/MultiSelectButton";
 import { DefaultButton } from "@/components/buttons/DefaultButton";
 import { LoadingTopBar } from "@/components/LoadingTopBar";
+import { SkipButton } from "@/components/onboarding/skip";
 
 const SYMPTOMS = [
   "Painful cramps",
@@ -38,6 +39,7 @@ export default function SymptomsInfoScreen() {
   return (
     <ThemedView style={styles.container}>
       <LoadingTopBar progress={50} style={styles.progressBar} />
+      <SkipButton href="/(tabs)" />
       <View style={styles.content}>
         <ThemedText type="title" style={styles.title}>
           Do you experience any of the following symptoms during your period?

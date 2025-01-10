@@ -1,11 +1,9 @@
-import { StyleSheet, useColorScheme, View } from "react-native";
+import { ScrollView, StyleSheet, useColorScheme, View } from "react-native";
 import { useState } from "react";
 import { Colors } from "@/constants/Colors";
-import { router } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { MultiSelectButton } from "@/components/buttons/MultiSelectButton";
-import { DefaultButton } from "@/components/buttons/DefaultButton";
 import { LoadingTopBar } from "@/components/LoadingTopBar";
 import { SkipButton } from "@/components/onboarding/skip";
 import { NextButton } from "@/components/onboarding/next";
@@ -34,9 +32,6 @@ export default function SymptomsInfoScreen() {
     );
   };
 
-  const handleContinue = () => {
-    router.push("/(tabs)");
-  };
 
   return (
     <ThemedView style={styles.container}>
@@ -46,17 +41,17 @@ export default function SymptomsInfoScreen() {
         <ThemedText type="title" style={styles.title}>
           Do you experience any of the following symptoms during your period?
         </ThemedText>
-
-        {SYMPTOMS.map((symptom) => (
-          <MultiSelectButton
-            key={symptom}
-            onPress={() => toggleSymptom(symptom)}
-            isSelected={selectedSymptoms.includes(symptom)}
-          >
-            {symptom}
-          </MultiSelectButton>
-        ))}
-
+        <ScrollView>
+          {SYMPTOMS.map((symptom) => (
+            <MultiSelectButton
+              key={symptom}
+              onPress={() => toggleSymptom(symptom)}
+              isSelected={selectedSymptoms.includes(symptom)}
+            >
+              {symptom}
+            </MultiSelectButton>
+          ))}
+        </ScrollView>
         <NextButton href="/(tabs)" />
         <BackButton />
       </View>

@@ -1,8 +1,7 @@
-import { StyleSheet, useColorScheme, View } from "react-native";
+import { StyleSheet, useColorScheme, View, ScrollView } from "react-native";
 import { DefaultButton } from "@/components/buttons/DefaultButton";
 import { useState } from "react";
 import { Colors } from "@/constants/Colors";
-import { router } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { LoadingTopBar } from "@/components/LoadingTopBar";
@@ -23,28 +22,28 @@ export default function CycleInfoScreen() {
         <ThemedText type="title" style={styles.title}>
           Is your cycle regular?
         </ThemedText>
+        <ScrollView>
+          <DefaultButton
+            onPress={() => setSelectedOption("regular")}
+            isSelected={selectedOption === "regular"}
+          >
+            My cycle is regular
+          </DefaultButton>
 
-        <DefaultButton
-          onPress={() => setSelectedOption("regular")}
-          isSelected={selectedOption === "regular"}
-        >
-          My cycle is regular
-        </DefaultButton>
+          <DefaultButton
+            onPress={() => setSelectedOption("irregular")}
+            isSelected={selectedOption === "irregular"}
+          >
+            My cycle is irregular
+          </DefaultButton>
 
-        <DefaultButton
-          onPress={() => setSelectedOption("irregular")}
-          isSelected={selectedOption === "irregular"}
-        >
-          My cycle is irregular
-        </DefaultButton>
-
-        <DefaultButton
-          onPress={() => setSelectedOption("unsure")}
-          isSelected={selectedOption === "unsure"}
-        >
-          I am not sure
-        </DefaultButton>
-
+          <DefaultButton
+            onPress={() => setSelectedOption("unsure")}
+            isSelected={selectedOption === "unsure"}
+          >
+            I am not sure
+          </DefaultButton>
+        </ScrollView>
         <NextButton href="/onboarding/symptoms-info" />
         <BackButton />
       </View>

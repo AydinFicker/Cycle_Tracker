@@ -21,7 +21,10 @@ export const LoadingTopBar: React.FC<LoadingTopBarProps> = ({
     <View style={[styles.container, style]}>
       {/* Background bar */}
       <View
-        style={[styles.backgroundBar, { backgroundColor: theme.middlegrey }]}
+        style={[
+          styles.backgroundBar,
+          { backgroundColor: theme.buttonBackground },
+        ]}
       />
 
       {/* Progress bar */}

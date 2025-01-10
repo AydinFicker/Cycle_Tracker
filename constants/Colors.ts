@@ -19,7 +19,7 @@ export const Colors = {
     yellow: "#F7AF73",
     darkgrey: "#858585",
     black: "#030303",
-    middlegrey: "#E9E9E9",
+    buttonBackground: "#E9E9E9",
     white: "#FFFFFF",
   },
   dark: {
@@ -34,7 +34,7 @@ export const Colors = {
     yellow: "#F7AF73",
     darkgrey: "#858585",
     black: "#030303",
-    middlegrey: "#2A2A2A",
+    buttonBackground: "#2A2A2A",
     white: "#FFFFFF",
   },
 };

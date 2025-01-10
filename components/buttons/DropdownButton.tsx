@@ -37,7 +37,7 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
         style={[
           styles.button,
           {
-            backgroundColor: theme.middlegrey,
+            backgroundColor: theme.buttonBackground,
           },
         ]}
         onPress={() => setIsOpen(true)}
@@ -72,7 +72,7 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
                 style={[
                   styles.option,
                   {
-                    backgroundColor: theme.middlegrey,
+                    backgroundColor: theme.buttonBackground,
                     borderBottomWidth: index !== options.length - 1 ? 1 : 0,
                     borderBottomColor: theme.background,
                   },

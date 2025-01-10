@@ -35,7 +35,7 @@ export default function SymptomsInfoScreen() {
   return (
     <ThemedView style={styles.container}>
       <LoadingTopBar progress={50} style={styles.progressBar} />
-      <SkipButton href="/(tabs)" />
+      <SkipButton href="/onboarding/health-info" />
       <View style={styles.content}>
         <ThemedText type="title" style={styles.title}>
           Do you experience any of the following symptoms during your period?
@@ -51,7 +51,7 @@ export default function SymptomsInfoScreen() {
             </MultiSelectButton>
           ))}
         </ScrollView>
-        <NextButton href="/(tabs)" />
+        <NextButton href="/onboarding/health-info" />
         <BackButton />
       </View>
     </ThemedView>

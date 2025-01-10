@@ -49,21 +49,26 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
           style={[
             styles.dropdown,
             {
-              backgroundColor: theme.background,
-              borderColor: theme.middlegrey,
+              backgroundColor: theme.middlegrey,
             },
           ]}
         >
-          {options.map((option) => (
+          {options.map((option, index) => (
             <TouchableOpacity
               key={option}
-              style={[styles.option, { borderBottomColor: theme.middlegrey }]}
+              style={[
+                styles.option,
+                index !== options.length - 1 && {
+                  borderBottomWidth: 1,
+                  borderBottomColor: theme.background,
+                },
+              ]}
               onPress={() => {
                 onSelect(option);
                 setIsOpen(false);
               }}
             >
-              <ThemedText>{option}</ThemedText>
+              <Text style={styles.text}>{option}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -89,6 +94,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: "500",
+    color: "#000",
   },
   dropdown: {
     position: "absolute",
@@ -97,7 +103,6 @@ const styles = StyleSheet.create({
     right: 0,
     borderRadius: 15,
     marginTop: 8,
-    borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -106,6 +111,5 @@ const styles = StyleSheet.create({
   },
   option: {
     padding: 16,
-    borderBottomWidth: 1,
   },
 });

@@ -61,7 +61,9 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
           activeOpacity={1}
           onPress={() => setIsOpen(false)}
         >
-          <View style={styles.modalContent}>
+          <View
+            style={[styles.modalContent, { backgroundColor: theme.background }]}
+          >
             {options.map((option, index) => (
               <TouchableOpacity
                 key={option}

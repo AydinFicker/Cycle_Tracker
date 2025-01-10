@@ -1,5 +1,5 @@
 import { StyleSheet, useColorScheme, View, ScrollView } from "react-native";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Colors } from "@/constants/Colors";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -18,13 +18,6 @@ export default function HealthInfoScreen() {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
-  const handleConditionSelect = useCallback((condition: string) => {
-    console.log("HealthInfoScreen - condition selected:", condition);
-    setSelectedCondition(condition);
-  }, []);
-
-  console.log("Current selected condition:", selectedCondition);
-
   return (
     <ThemedView style={styles.container}>
       <LoadingTopBar progress={75} style={styles.progressBar} />
@@ -36,10 +29,7 @@ export default function HealthInfoScreen() {
 
         <ScrollView>
           <DefaultButton
-            onPress={() => {
-              console.log("Yes selected");
-              setSelectedOption("yes");
-            }}
+            onPress={() => setSelectedOption("yes")}
             isSelected={selectedOption === "yes"}
           >
             Yes
@@ -47,7 +37,6 @@ export default function HealthInfoScreen() {
 
           <DefaultButton
             onPress={() => {
-              console.log("No selected");
               setSelectedOption("no");
               setSelectedCondition("");
             }}
@@ -58,7 +47,6 @@ export default function HealthInfoScreen() {
 
           <DefaultButton
             onPress={() => {
-              console.log("Not sure selected");
               setSelectedOption("unsure");
               setSelectedCondition("");
             }}
@@ -70,7 +58,7 @@ export default function HealthInfoScreen() {
           {selectedOption === "yes" && (
             <DropdownButton
               value={selectedCondition}
-              onSelect={handleConditionSelect}
+              onSelect={setSelectedCondition}
               options={HEALTH_CONDITIONS}
             />
           )}

@@ -26,7 +26,6 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
   const theme = Colors[colorScheme];
 
   const handleOptionPress = (option: string) => {
-    console.log("Option selected:", option);
     onSelect(option);
     setIsOpen(false);
   };

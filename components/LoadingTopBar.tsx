@@ -1,7 +1,6 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "react-native";
 
 interface LoadingTopBarProps {
   progress: number; // 0 to 100

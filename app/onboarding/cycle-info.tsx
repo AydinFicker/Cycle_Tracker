@@ -7,6 +7,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { LoadingTopBar } from "@/components/LoadingTopBar";
 import { SkipButton } from "@/components/onboarding/skip";
+import { NextButton } from "@/components/onboarding/next";
 
 export default function CycleInfoScreen() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -49,14 +50,7 @@ export default function CycleInfoScreen() {
           I am not sure
         </DefaultButton>
 
-        <DefaultButton
-          onPress={handleContinue}
-          style={[styles.continueButton, { opacity: selectedOption ? 1 : 0.5 }]}
-          defaultColor={theme.yellow}
-          defaultTextColor={theme.white}
-        >
-          Continue
-        </DefaultButton>
+        <NextButton href="/onboarding/symptoms-info" />
       </View>
     </ThemedView>
   );

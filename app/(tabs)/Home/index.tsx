@@ -5,6 +5,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { DefaultButton } from "@/components/buttons/DefaultButton";
 import { LoadingTopBar } from "@/components/onboarding/LoadingTopBar";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -16,7 +17,29 @@ export default function HomeScreen() {
         <ThemedText type="title" style={styles.title}>
           Main Home Screen
         </ThemedText>
-        {/* Add your home screen content here */}
+
+        <ScrollView style={styles.buttonContainer}>
+          <DefaultButton
+            onPress={() => router.push("/Home/cycleInsights")}
+            style={styles.button}
+          >
+            Cycle Insights
+          </DefaultButton>
+
+          <DefaultButton
+            onPress={() => router.push("/Home/ovulationDetails")}
+            style={styles.button}
+          >
+            Ovulation Details
+          </DefaultButton>
+
+          <DefaultButton
+            onPress={() => router.push("/Home/symptomDetails")}
+            style={styles.button}
+          >
+            Symptom Details
+          </DefaultButton>
+        </ScrollView>
       </View>
     </ThemedView>
   );
@@ -29,10 +52,17 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    paddingTop: 60,
   },
   title: {
     marginBottom: 30,
     textAlign: "center",
+  },
+  buttonContainer: {
+    flex: 1,
+  },
+  button: {
+    marginBottom: 16,
   },
 });

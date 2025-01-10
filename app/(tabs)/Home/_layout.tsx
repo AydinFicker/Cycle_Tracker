@@ -9,6 +9,9 @@ export default function HomeLayout() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="cycleInsights" />
+      <Stack.Screen name="ovulationDetails" />
+      <Stack.Screen name="symptomDetails" />
     </Stack>
   );
 }

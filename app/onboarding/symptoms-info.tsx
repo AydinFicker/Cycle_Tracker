@@ -8,6 +8,8 @@ import { MultiSelectButton } from "@/components/buttons/MultiSelectButton";
 import { DefaultButton } from "@/components/buttons/DefaultButton";
 import { LoadingTopBar } from "@/components/LoadingTopBar";
 import { SkipButton } from "@/components/onboarding/skip";
+import { NextButton } from "@/components/onboarding/next";
+import { BackButton } from "@/components/onboarding/back";
 
 const SYMPTOMS = [
   "Painful cramps",
@@ -55,14 +57,8 @@ export default function SymptomsInfoScreen() {
           </MultiSelectButton>
         ))}
 
-        <DefaultButton
-          onPress={handleContinue}
-          style={styles.continueButton}
-          defaultColor={theme.yellow}
-          defaultTextColor={theme.white}
-        >
-          Continue
-        </DefaultButton>
+        <NextButton href="/(tabs)" />
+        <BackButton />
       </View>
     </ThemedView>
   );

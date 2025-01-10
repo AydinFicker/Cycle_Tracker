@@ -8,17 +8,12 @@ import { ThemedText } from "@/components/ThemedText";
 import { LoadingTopBar } from "@/components/LoadingTopBar";
 import { SkipButton } from "@/components/onboarding/skip";
 import { NextButton } from "@/components/onboarding/next";
+import { BackButton } from "@/components/onboarding/back";
 
 export default function CycleInfoScreen() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
-
-  const handleContinue = () => {
-    if (selectedOption) {
-      router.push("/onboarding/symptoms-info");
-    }
-  };
 
   return (
     <ThemedView style={styles.container}>
@@ -51,6 +46,7 @@ export default function CycleInfoScreen() {
         </DefaultButton>
 
         <NextButton href="/onboarding/symptoms-info" />
+        <BackButton />
       </View>
     </ThemedView>
   );

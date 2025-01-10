@@ -36,7 +36,7 @@ export const DefaultButton: React.FC<DefaultButtonProps> = ({
   // Use provided colors or fallback to theme colors
   const buttonDefaultColor = defaultColor ?? theme.middlegrey;
   const buttonHighlightColor = highlightColor ?? theme.yellow;
-  const textDefaultColor = defaultTextColor ?? theme.black;
+  const textDefaultColor = defaultTextColor ?? theme.text;
   const textHighlightColor = highlightTextColor ?? theme.white;
 
   return (

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { ThemedText } from "../ThemedText";
 
 interface DropdownButtonProps {
   value: string;
@@ -41,11 +42,13 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
         ]}
         onPress={() => setIsOpen(true)}
       >
-        <Text style={styles.text}>{value || "Select your situation"}</Text>
+        <ThemedText style={styles.text}>
+          {value || "Select your situation"}
+        </ThemedText>
         <Ionicons
           name={isOpen ? "chevron-up" : "chevron-down"}
           size={24}
-          color={theme.black}
+          color={theme.text}
         />
       </TouchableOpacity>
 
@@ -77,7 +80,7 @@ export const DropdownButton: React.FC<DropdownButtonProps> = ({
                 onPress={() => handleOptionPress(option)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.optionText}>{option}</Text>
+                <ThemedText style={styles.optionText}>{option}</ThemedText>
               </TouchableOpacity>
             ))}
           </View>

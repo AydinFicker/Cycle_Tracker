@@ -37,7 +37,7 @@ export const MultiSelectButton: React.FC<MultiSelectButtonProps> = ({
 
   const buttonDefaultColor = defaultColor ?? theme.middlegrey;
   const buttonHighlightColor = highlightColor ?? theme.yellow;
-  const textDefaultColor = defaultTextColor ?? theme.black;
+  const textDefaultColor = defaultTextColor ?? theme.text;
   const textHighlightColor = highlightTextColor ?? theme.white;
 
   return (

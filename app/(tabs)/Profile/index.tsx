@@ -9,7 +9,7 @@ import { DefaultButton } from "@/components/buttons/DefaultButton";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
 
-export default function HomeIndexScreen() {
+export default function ProfileIndexScreen() {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
   const handleLogout = () => {

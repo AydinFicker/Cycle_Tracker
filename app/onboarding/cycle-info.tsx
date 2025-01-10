@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Colors } from "@/constants/Colors";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { LoadingTopBar } from "@/components/LoadingTopBar";
+import { LoadingTopBar } from "@/components/onboarding/LoadingTopBar";
 import { SkipButton } from "@/components/onboarding/skip";
 import { NextButton } from "@/components/onboarding/next";
 import { BackButton } from "@/components/onboarding/back";

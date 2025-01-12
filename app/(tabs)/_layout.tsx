@@ -25,25 +25,13 @@ export default function TabLayout() {
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: "absolute",
+            height: 80,
           },
-          default: {},
+          default: {
+            height: 80,
+          },
         }),
-        tabBarLabel: ({ focused, children, color }) => (
-          <ThemedText
-            style={[
-              styles.label,
-              {
-                color,
-                transform: [{ scale: focused ? 1.1 : 1 }],
-              },
-            ]}
-          >
-            {children}
-          </ThemedText>
-        ),
-        tabBarIconStyle: {
-          marginTop: 5,
-        },
+        tabBarLabel: () => null,
       }}
       initialRouteName="Home"
     >
@@ -59,21 +47,33 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <View
-              style={
-                focused
-                  ? [
-                      styles.activeIconContainer,
-                      { backgroundColor: theme.yellow + "20" },
-                    ]
-                  : null
-              }
-            >
-              <IconSymbol
-                size={focused ? 32 : 28}
-                name="house.fill"
-                color={color}
-              />
+            <View style={styles.tabItemWrapper}>
+              <View
+                style={[
+                  styles.tabItemContainer,
+                  focused && [
+                    styles.activeTabContainer,
+                    { backgroundColor: theme.yellow + "20" },
+                  ],
+                ]}
+              >
+                <IconSymbol
+                  size={focused ? 32 : 28}
+                  name="house.fill"
+                  color={color}
+                />
+                <ThemedText
+                  style={[
+                    styles.label,
+                    {
+                      color,
+                      transform: [{ scale: focused ? 1.1 : 1 }],
+                    },
+                  ]}
+                >
+                  Home
+                </ThemedText>
+              </View>
             </View>
           ),
         }}
@@ -83,21 +83,33 @@ export default function TabLayout() {
         options={{
           title: "Calendar",
           tabBarIcon: ({ color, focused }) => (
-            <View
-              style={
-                focused
-                  ? [
-                      styles.activeIconContainer,
-                      { backgroundColor: theme.yellow + "20" },
-                    ]
-                  : null
-              }
-            >
-              <IconSymbol
-                size={focused ? 32 : 28}
-                name="calendar"
-                color={color}
-              />
+            <View style={styles.tabItemWrapper}>
+              <View
+                style={[
+                  styles.tabItemContainer,
+                  focused && [
+                    styles.activeTabContainer,
+                    { backgroundColor: theme.yellow + "20" },
+                  ],
+                ]}
+              >
+                <IconSymbol
+                  size={focused ? 32 : 28}
+                  name="calendar"
+                  color={color}
+                />
+                <ThemedText
+                  style={[
+                    styles.label,
+                    {
+                      color,
+                      transform: [{ scale: focused ? 1.1 : 1 }],
+                    },
+                  ]}
+                >
+                  Calendar
+                </ThemedText>
+              </View>
             </View>
           ),
         }}
@@ -107,21 +119,33 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
-            <View
-              style={
-                focused
-                  ? [
-                      styles.activeIconContainer,
-                      { backgroundColor: theme.yellow + "20" },
-                    ]
-                  : null
-              }
-            >
-              <IconSymbol
-                size={focused ? 32 : 28}
-                name="person.fill"
-                color={color}
-              />
+            <View style={styles.tabItemWrapper}>
+              <View
+                style={[
+                  styles.tabItemContainer,
+                  focused && [
+                    styles.activeTabContainer,
+                    { backgroundColor: theme.yellow + "20" },
+                  ],
+                ]}
+              >
+                <IconSymbol
+                  size={focused ? 32 : 28}
+                  name="person.fill"
+                  color={color}
+                />
+                <ThemedText
+                  style={[
+                    styles.label,
+                    {
+                      color,
+                      transform: [{ scale: focused ? 1.1 : 1 }],
+                    },
+                  ]}
+                >
+                  Profile
+                </ThemedText>
+              </View>
             </View>
           ),
         }}
@@ -131,15 +155,27 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
+  tabItemWrapper: {
+    flex: 1,
+    paddingTop: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabItemContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+    minWidth: 110,
+    paddingVertical: 20,
+  },
+  activeTabContainer: {
+    paddingHorizontal: 16,
+  },
   label: {
     fontSize: 12,
     fontWeight: "500",
-    marginBottom: 5,
-  },
-  activeIconContainer: {
-    padding: 8,
-    borderRadius: 50,
-    paddingHorizontal: 45,
-    // paddingVertical: 10,
+    marginTop: -2,
+    textAlign: "center",
   },
 });

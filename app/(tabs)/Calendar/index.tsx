@@ -62,21 +62,38 @@ export default function CalendarScreen() {
           markedDates={markedDates}
           // Theme customization
           theme={{
-            backgroundColor: theme.background,
-            calendarBackground: theme.background,
+            // Background colors
+            backgroundColor: "transparent",
+            calendarBackground: "transparent",
+
+            // Text colors for days and headers
             textSectionTitleColor: theme.text,
-            selectedDayBackgroundColor: theme.yellow,
-            selectedDayTextColor: theme.text,
-            todayTextColor: theme.yellow,
             dayTextColor: theme.text,
-            textDisabledColor: theme.darkgrey,
-            dotColor: theme.yellow,
-            selectedDotColor: theme.text,
-            arrowColor: theme.text,
             monthTextColor: theme.text,
+            textDisabledColor: theme.darkgrey,
+
+            // Selected day
+            selectedDayBackgroundColor: theme.yellow,
+            selectedDayTextColor: theme.background,
+
+            // Today
+            todayTextColor: theme.yellow,
+            todayBackgroundColor: "transparent",
+
+            // Arrows and other UI elements
+            arrowColor: theme.text,
+
+            // Font sizes
             textDayFontSize: 16,
             textMonthFontSize: 16,
             textDayHeaderFontSize: 14,
+
+            // Additional styles
+            textSectionTitleDisabledColor: theme.darkgrey,
+            textDayStyle: { color: theme.text },
+            textMonthFontWeight: "bold",
+            textDayFontWeight: "400",
+            textDayHeaderFontWeight: "400",
           }}
           style={styles.calendar}
         />

@@ -3,6 +3,7 @@ import { Colors } from "@/constants/Colors";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { CalendarList, DateData } from "react-native-calendars";
+import { CircleLegend } from "@/components/CircleLegends";
 
 export default function CalendarScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -167,6 +168,12 @@ export default function CalendarScreen() {
           }}
           style={styles.calendar}
         />
+
+        <View style={styles.legendContainer}>
+          <CircleLegend color={theme.yellow40}>Today</CircleLegend>
+          <CircleLegend color={theme.red40}>Period</CircleLegend>
+          <CircleLegend color={theme.blue40}>Ovulation</CircleLegend>
+        </View>
       </View>
     </ThemedView>
   );
@@ -188,5 +195,11 @@ const styles = StyleSheet.create({
   },
   calendar: {
     height: 350,
+  },
+  legendContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
   },
 });

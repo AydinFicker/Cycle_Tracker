@@ -14,29 +14,8 @@ export default function CalendarScreen() {
   // Create base marked dates without today
   const baseMarkedDates = {
     // Period dates (red)
-    "2025-01-12": {
-      startingDay: true,
-      color: theme.red,
-      ...(today === "2025-01-12" && {
-        color: theme.yellow,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-13": {
-      color: theme.red,
-      ...(today === "2025-01-13" && {
-        color: theme.yellow,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-14": {
-      color: theme.red,
-      ...(today === "2025-01-14" && {
-        color: theme.yellow,
-        textColor: theme.white,
-      }),
-    },
     "2025-01-15": {
+      startingDay: true,
       color: theme.red,
       ...(today === "2025-01-15" && {
         color: theme.yellow,
@@ -58,47 +37,75 @@ export default function CalendarScreen() {
       }),
     },
     "2025-01-18": {
-      endingDay: true,
       color: theme.red,
       ...(today === "2025-01-18" && {
         color: theme.yellow,
         textColor: theme.white,
       }),
     },
+    "2025-01-19": {
+      color: theme.red,
+      ...(today === "2025-01-19" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
+    },
+    "2025-01-20": {
+      color: theme.red,
+      ...(today === "2025-01-20" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
+    },
+    "2025-01-21": {
+      endingDay: true,
+      color: theme.red,
+      ...(today === "2025-01-21" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
+    },
     // Ovulation dates (blue)
-    "2025-02-24": {
+    "2025-01-29": {
       startingDay: true,
       color: theme.blue,
-      ...(today === "2025-02-24" && {
+      ...(today === "2025-01-29" && {
         color: theme.yellow,
         textColor: theme.white,
       }),
     },
-    "2025-02-25": {
+    "2025-01-30": {
       color: theme.blue,
-      ...(today === "2025-02-25" && {
+      ...(today === "2025-01-30" && {
         color: theme.yellow,
         textColor: theme.white,
       }),
     },
-    "2025-02-26": {
+    "2025-01-31": {
       color: theme.blue,
-      ...(today === "2025-02-26" && {
+      ...(today === "2025-01-31" && {
         color: theme.yellow,
         textColor: theme.white,
       }),
     },
-    "2025-02-27": {
+    "2025-02-01": {
       color: theme.blue,
-      ...(today === "2025-02-27" && {
+      ...(today === "2025-02-01" && {
         color: theme.yellow,
         textColor: theme.white,
       }),
     },
-    "2025-02-28": {
+    "2025-02-02": {
+      color: theme.blue,
+      ...(today === "2025-02-02" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
+    },
+    "2025-02-03": {
       endingDay: true,
       color: theme.blue,
-      ...(today === "2025-02-28" && {
+      ...(today === "2025-02-03" && {
         color: theme.yellow,
         textColor: theme.white,
       }),

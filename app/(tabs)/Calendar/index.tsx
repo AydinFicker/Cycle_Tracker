@@ -9,49 +9,113 @@ export default function CalendarScreen() {
   const theme = Colors[colorScheme];
   const screenWidth = Dimensions.get("window").width;
 
-  const markedDates = {
-    [new Date().toISOString().split("T")[0]]: {
-      color: theme.yellow,
-      textColor: theme.white,
-      startingDay: true,
-      endingDay: true,
-    },
+  const today = new Date().toISOString().split("T")[0];
+
+  // Create base marked dates without today
+  const baseMarkedDates = {
     // Period dates (red)
-    "2025-02-09": {
+    "2025-01-12": {
       startingDay: true,
       color: theme.red,
+      ...(today === "2025-01-12" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
-    "2025-02-10": {
+    "2025-01-13": {
       color: theme.red,
+      ...(today === "2025-01-13" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
-    "2025-02-11": {
+    "2025-01-14": {
       color: theme.red,
+      ...(today === "2025-01-14" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
-    "2025-02-12": {
+    "2025-01-15": {
       color: theme.red,
+      ...(today === "2025-01-15" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
-    "2025-02-13": {
+    "2025-01-16": {
+      color: theme.red,
+      ...(today === "2025-01-16" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
+    },
+    "2025-01-17": {
+      color: theme.red,
+      ...(today === "2025-01-17" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
+    },
+    "2025-01-18": {
       endingDay: true,
       color: theme.red,
+      ...(today === "2025-01-18" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
     // Ovulation dates (blue)
     "2025-02-24": {
       startingDay: true,
       color: theme.blue,
+      ...(today === "2025-02-24" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
     "2025-02-25": {
       color: theme.blue,
+      ...(today === "2025-02-25" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
     "2025-02-26": {
       color: theme.blue,
+      ...(today === "2025-02-26" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
     "2025-02-27": {
       color: theme.blue,
+      ...(today === "2025-02-27" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
     "2025-02-28": {
       endingDay: true,
       color: theme.blue,
+      ...(today === "2025-02-28" && {
+        color: theme.yellow,
+        textColor: theme.white,
+      }),
     },
+  };
+
+  // Add standalone today if it's not in any period
+  const markedDates = {
+    ...baseMarkedDates,
+    ...(!(today in baseMarkedDates) && {
+      [today]: {
+        color: theme.yellow,
+        textColor: theme.white,
+        startingDay: true,
+        endingDay: true,
+      },
+    }),
   };
 
   const handleDayPress = (day: DateData) => {

@@ -16,97 +16,97 @@ export default function CalendarScreen() {
     // Period dates (red)
     "2025-01-15": {
       startingDay: true,
-      color: theme.red,
+      color: theme.red40,
       ...(today === "2025-01-15" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-01-16": {
-      color: theme.red,
+      color: theme.red40,
       ...(today === "2025-01-16" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-01-17": {
-      color: theme.red,
+      color: theme.red40,
       ...(today === "2025-01-17" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-01-18": {
-      color: theme.red,
+      color: theme.red40,
       ...(today === "2025-01-18" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-01-19": {
-      color: theme.red,
+      color: theme.red40,
       ...(today === "2025-01-19" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-01-20": {
-      color: theme.red,
+      color: theme.red40,
       ...(today === "2025-01-20" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-01-21": {
       endingDay: true,
-      color: theme.red,
+      color: theme.red40,
       ...(today === "2025-01-21" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     // Ovulation dates (blue)
     "2025-01-29": {
       startingDay: true,
-      color: theme.blue,
+      color: theme.blue40,
       ...(today === "2025-01-29" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-01-30": {
-      color: theme.blue,
+      color: theme.blue40,
       ...(today === "2025-01-30" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-01-31": {
-      color: theme.blue,
+      color: theme.blue40,
       ...(today === "2025-01-31" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-02-01": {
-      color: theme.blue,
+      color: theme.blue40,
       ...(today === "2025-02-01" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-02-02": {
-      color: theme.blue,
+      color: theme.blue40,
       ...(today === "2025-02-02" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
     "2025-02-03": {
       endingDay: true,
-      color: theme.blue,
+      color: theme.blue40,
       ...(today === "2025-02-03" && {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
       }),
     },
@@ -117,7 +117,7 @@ export default function CalendarScreen() {
     ...baseMarkedDates,
     ...(!(today in baseMarkedDates) && {
       [today]: {
-        color: theme.yellow,
+        color: theme.yellow40,
         textColor: theme.white,
         startingDay: true,
         endingDay: true,
@@ -153,7 +153,7 @@ export default function CalendarScreen() {
             textDisabledColor: theme.darkgrey,
             selectedDayBackgroundColor: "transparent",
             selectedDayTextColor: theme.text,
-            todayTextColor: theme.yellow,
+            todayTextColor: theme.yellow40,
             todayBackgroundColor: "transparent",
             arrowColor: theme.text,
             textDayFontSize: 16,

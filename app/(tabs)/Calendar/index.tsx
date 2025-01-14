@@ -10,6 +10,12 @@ export default function CalendarScreen() {
   const screenWidth = Dimensions.get("window").width;
 
   const markedDates = {
+    [new Date().toISOString().split("T")[0]]: {
+      color: theme.yellow,
+      textColor: theme.white,
+      startingDay: true,
+      endingDay: true,
+    },
     // Period dates (red)
     "2025-02-09": {
       startingDay: true,

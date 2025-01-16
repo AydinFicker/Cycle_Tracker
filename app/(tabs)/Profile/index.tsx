@@ -9,6 +9,7 @@ import { Header } from "@/components/Header";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import { ProfilePersonal } from "@/components/ProfilePersonal";
+import { ProfileIndexBackground } from "@/components/backgrounds/ProfileIndexBackground";
 
 export default function ProfileIndexScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -23,6 +24,8 @@ export default function ProfileIndexScreen() {
       <SafeAreaView
         style={[styles.container, { backgroundColor: theme.background }]}
       >
+        <ProfileIndexBackground />
+
         <Header title="Profile" style={styles.header} />
 
         <View style={styles.content}>

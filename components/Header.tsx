@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Pressable } from "react-native";
+import { StyleSheet, View, Pressable, ViewStyle } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -9,17 +9,19 @@ import { Colors } from "@/constants/Colors";
 interface HeaderProps {
   title: string;
   showBackButton?: boolean;
+  style?: ViewStyle;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   title,
   showBackButton = false,
+  style,
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <View style={styles.leftContainer}>
         {showBackButton ? (
           <Pressable hitSlop={8} onPress={() => router.back()}>

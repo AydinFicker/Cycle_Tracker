@@ -8,6 +8,7 @@ import { router } from "expo-router";
 import { Header } from "@/components/Header";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
+import { ProfilePersonal } from "@/components/ProfilePersonal";
 
 export default function ProfileIndexScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -22,13 +23,14 @@ export default function ProfileIndexScreen() {
       <SafeAreaView
         style={[styles.container, { backgroundColor: theme.background }]}
       >
-        <Header title="Profile" />
+        <Header title="Profile" style={styles.header} />
 
         <View style={styles.content}>
+          <ProfilePersonal onPress={() => router.push("/(tabs)")}>
+            <ThemedText type="title">Ella Jones</ThemedText>
+          </ProfilePersonal>
+
           <View style={styles.premiumSection}>
-            <ThemedText type="title" style={styles.endSonesText}>
-              End Sones
-            </ThemedText>
             <BigButton
               onPress={() => {}}
               defaultColor={theme.yellow}
@@ -61,8 +63,8 @@ export default function ProfileIndexScreen() {
             </View>
           </View>
 
-          <View style={styles.menuContainer}>
-            <ScrollView>
+          <ScrollView style={styles.menuScroll}>
+            <View style={styles.menuContainer}>
               <FullButton
                 icon={
                   <Ionicons
@@ -150,19 +152,22 @@ export default function ProfileIndexScreen() {
               >
                 Update Situation Details
               </FullButton>
-            </ScrollView>
-          </View>
-        </View>
 
-        <FullButton
-          icon={<Ionicons name="log-out" size={24} color={theme.white} />}
-          onPress={handleLogout}
-          style={styles.logoutButton}
-          defaultColor={theme.red}
-          defaultTextColor={theme.white}
-        >
-          Log Out
-        </FullButton>
+              <View style={styles.logoutSection}>
+                <FullButton
+                  icon={
+                    <Ionicons name="log-out" size={24} color={theme.white} />
+                  }
+                  onPress={handleLogout}
+                  defaultColor={theme.red}
+                  defaultTextColor={theme.white}
+                >
+                  Log Out
+                </FullButton>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -172,17 +177,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+  },
   content: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 50, // Height of header
   },
   premiumSection: {
     alignItems: "center",
     paddingHorizontal: 20,
     marginBottom: 20,
-  },
-  endSonesText: {
-    marginBottom: 12,
   },
   upgradeButton: {
     width: "100%",
@@ -198,10 +207,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
   },
+  menuScroll: {
+    flex: 1,
+  },
   menuContainer: {
     gap: 6,
   },
-  logoutButton: {
-    marginBottom: "15%",
+  logoutSection: {
+    marginTop: 40,
+    marginBottom: 60,
   },
 });

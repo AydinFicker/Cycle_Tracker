@@ -4,6 +4,9 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { CalendarList, DateData } from "react-native-calendars";
 import { CircleLegend } from "@/components/CircleLegends";
+import { ThickIconDefaultButton } from "@/components/buttons/ThickIconDefaultButton";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 export default function CalendarScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -174,6 +177,28 @@ export default function CalendarScreen() {
           <CircleLegend color={theme.red40}>Period</CircleLegend>
           <CircleLegend color={theme.blue40}>Ovulation</CircleLegend>
         </View>
+
+        <View style={styles.buttonContainer}>
+          <ThickIconDefaultButton
+            onPress={() => router.push("/(tabs)")}
+            icon={<Ionicons name="pencil" size={24} color={theme.white} />}
+            defaultColor={theme.yellow}
+            defaultTextColor={theme.white}
+            style={styles.leftButton}
+          >
+            Log Today's{"\n"}Symptoms
+          </ThickIconDefaultButton>
+
+          <ThickIconDefaultButton
+            onPress={() => router.push("/(tabs)")}
+            icon={<Ionicons name="search" size={24} color={theme.white} />}
+            defaultColor={theme.blue}
+            defaultTextColor={theme.white}
+            style={styles.rightButton}
+          >
+            Look Up a{"\n"}Previous Log
+          </ThickIconDefaultButton>
+        </View>
       </View>
     </ThemedView>
   );
@@ -201,5 +226,18 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingVertical: 16,
     paddingHorizontal: 20,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+    marginBottom: 20,
+    marginTop: "10%",
+  },
+  leftButton: {
+    flex: 1,
+  },
+  rightButton: {
+    flex: 1,
   },
 });

@@ -51,6 +51,7 @@ export const DefaultButton: React.FC<DefaultButtonProps> = ({
         style,
       ]}
       onPress={onPress}
+      activeOpacity={0.7}
     >
       <Text
         style={[

@@ -45,6 +45,7 @@ export const ThickIconDefaultButton: React.FC<ThickIconDefaultButtonProps> = ({
         style,
       ]}
       onPress={onPress}
+      activeOpacity={0.7}
     >
       <View style={styles.content}>
         <View style={styles.iconContainer}>{icon}</View>

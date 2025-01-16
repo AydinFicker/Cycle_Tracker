@@ -52,6 +52,7 @@ export const MultiSelectButton: React.FC<MultiSelectButtonProps> = ({
         style,
       ]}
       onPress={onPress}
+      activeOpacity={0.7}
     >
       <Text
         style={[

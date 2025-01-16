@@ -29,6 +29,7 @@ export const FullButton: React.FC<FullButtonProps> = ({
         defaultColor ? { backgroundColor: defaultColor } : {},
         style,
       ]}
+      activeOpacity={0.7}
     >
       {icon && <View style={styles.leftIcon}>{icon}</View>}
       <ThemedText

@@ -1,11 +1,11 @@
 import { StyleSheet, useColorScheme, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { IconDefaultButton } from "@/components/buttons/IconDefaultButton";
 import { router } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
+import { SignUpFlowerBackground } from "@/components/backgrounds/SignUpFlowerBackground";
 
 export default function SignUpScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -13,56 +13,7 @@ export default function SignUpScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.flowersContainer}>
-        <Ionicons
-          name="flower"
-          size={175}
-          style={[
-            styles.flower,
-            { opacity: 0.35, top: 0, right: -90, color: theme.text },
-          ]}
-        />
-        <Ionicons
-          name="flower"
-          size={120}
-          style={[
-            styles.flower,
-            { opacity: 0.25, top: 0, right: 90, color: theme.text },
-          ]}
-        />
-        <Ionicons
-          name="flower"
-          size={45}
-          style={[
-            styles.flower,
-            { opacity: 0.1, top: 120, right: 80, color: theme.text },
-          ]}
-        />
-        <Ionicons
-          name="flower"
-          size={80}
-          style={[
-            styles.flower,
-            { opacity: 0.15, top: 150, right: 140, color: theme.text },
-          ]}
-        />
-        <Ionicons
-          name="flower"
-          size={50}
-          style={[
-            styles.flower,
-            { opacity: 0.05, top: 240, right: 80, color: theme.text },
-          ]}
-        />
-        <Ionicons
-          name="flower"
-          size={80}
-          style={[
-            styles.flower,
-            { opacity: 0.15, top: 200, right: -30, color: theme.text },
-          ]}
-        />
-      </View>
+      <SignUpFlowerBackground />
 
       <View style={styles.contentContainer}>
         <ThemedText type="title" style={styles.title}>
@@ -115,16 +66,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-  },
-  flowersContainer: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    right: 20,
-    height: 200,
-  },
-  flower: {
-    position: "absolute",
   },
   contentContainer: {
     flex: 1,

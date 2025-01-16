@@ -7,6 +7,7 @@ import { CircleLegend } from "@/components/CircleLegends";
 import { ThickIconDefaultButton } from "@/components/buttons/ThickIconDefaultButton";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { CalendarIndexBackground } from "@/components/backgrounds/CalendarIndexBackground";
 
 export default function CalendarScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -136,6 +137,7 @@ export default function CalendarScreen() {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
+        <CalendarIndexBackground />
         <ThemedText type="title" style={styles.title}>
           Calendar
         </ThemedText>

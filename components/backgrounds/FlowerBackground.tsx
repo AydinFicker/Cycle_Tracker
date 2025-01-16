@@ -7,7 +7,8 @@ import { Colors } from "@/constants/Colors";
 interface FlowerProps {
   size: number;
   opacity: number;
-  top: number;
+  top?: number;
+  bottom?: number;
   right?: number;
   left?: number;
   color?: string;
@@ -36,7 +37,8 @@ export const FlowerBackground: React.FC<FlowerBackgroundProps> = ({
             styles.flower,
             {
               opacity: flower.opacity,
-              top: flower.top,
+              ...(flower.top !== undefined && { top: flower.top }),
+              ...(flower.bottom !== undefined && { bottom: flower.bottom }),
               ...(flower.right !== undefined && { right: flower.right }),
               ...(flower.left !== undefined && { left: flower.left }),
               color: flower.color ?? theme.text,

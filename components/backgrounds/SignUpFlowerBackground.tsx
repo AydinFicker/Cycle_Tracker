@@ -1,12 +1,7 @@
 import React from "react";
 import { FlowerBackground } from "./FlowerBackground";
-import { useColorScheme } from "react-native";
-import { Colors } from "@/constants/Colors";
 
 export const SignUpFlowerBackground: React.FC = () => {
-  const colorScheme = useColorScheme() ?? "light";
-  const theme = Colors[colorScheme];
-
   const flowers = [
     { size: 175, opacity: 0.35, top: 0, right: -90 },
     { size: 120, opacity: 0.25, top: 0, right: 90 },

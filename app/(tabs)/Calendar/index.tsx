@@ -8,6 +8,7 @@ import { ThickIconDefaultButton } from "@/components/buttons/ThickIconDefaultBut
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { CalendarIndexBackground } from "@/components/backgrounds/CalendarIndexBackground";
+import { Header } from "@/components/Header";
 
 export default function CalendarScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -136,12 +137,9 @@ export default function CalendarScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <CalendarIndexBackground />
+      <Header title="Calendar" showBackButton={false} />
       <View style={styles.content}>
-        <CalendarIndexBackground />
-        <ThemedText type="title" style={styles.title}>
-          Calendar
-        </ThemedText>
-
         <CalendarList
           horizontal={false}
           calendarWidth={screenWidth - 40}
@@ -212,13 +210,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
-    justifyContent: "flex-start",
-    paddingTop: 60,
-  },
-  title: {
-    marginBottom: 30,
-    textAlign: "center",
+    paddingHorizontal: 20,
   },
   calendar: {
     height: 350,
@@ -227,7 +219,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     paddingVertical: 16,
-    paddingHorizontal: 20,
   },
   buttonContainer: {
     flexDirection: "row",

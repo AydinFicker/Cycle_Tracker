@@ -1,13 +1,9 @@
-import {
-  StyleSheet,
-  View,
-  useColorScheme,
-  Text,
-} from "react-native";
+import { StyleSheet, View, useColorScheme, Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { DefaultButton } from "@/components/buttons/DefaultButton";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
+import { Header } from "@/components/Header";
 
 export default function ProfileIndexScreen() {
   const colorScheme = useColorScheme() ?? "light";
@@ -22,7 +18,8 @@ export default function ProfileIndexScreen() {
         style={[styles.container, { backgroundColor: theme.background }]}
       >
         <View style={styles.content}>
-          <Text style={{ color: theme.text }}> Settings </Text>
+          <Header title="Profile" />
+          {/* Rest of your profile screen content */}
         </View>
 
         <DefaultButton

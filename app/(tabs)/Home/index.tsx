@@ -1,22 +1,14 @@
-import { StyleSheet, useColorScheme, View, ScrollView } from "react-native";
-import { useState } from "react";
-import { Colors } from "@/constants/Colors";
+import { StyleSheet, View, ScrollView } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
 import { DefaultButton } from "@/components/buttons/DefaultButton";
-import { LoadingTopBar } from "@/components/onboarding/LoadingTopBar";
 import { router } from "expo-router";
+import { Header } from "@/components/Header";
 
 export default function HomeScreen() {
-  const colorScheme = useColorScheme() ?? "light";
-  const theme = Colors[colorScheme];
-
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
-        <ThemedText type="title" style={styles.title}>
-          Main Home Screen
-        </ThemedText>
+        <Header title="Home" showBackButton={false} />
 
         <ScrollView style={styles.buttonContainer}>
           <DefaultButton

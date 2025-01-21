@@ -21,7 +21,7 @@ export default function HealthInfoScreen() {
   return (
     <ThemedView style={styles.container}>
       <LoadingTopBar progress={75} style={styles.progressBar} />
-      <SkipButton href="/(tabs)" />
+      <SkipButton href="/onboarding/period-dates" />
       <View style={styles.content}>
         <ThemedText type="title" style={styles.title}>
           Do you have any reproductive health disorders?
@@ -64,7 +64,7 @@ export default function HealthInfoScreen() {
           )}
         </ScrollView>
 
-        <NextButton href="/(tabs)" />
+        <NextButton href="/onboarding/period-dates" />
         <BackButton />
       </View>
     </ThemedView>

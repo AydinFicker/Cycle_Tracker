@@ -11,7 +11,7 @@ export const WeeklyCalendar = () => {
   // Generate array of next 7 days starting from today
   const generateWeekDays = () => {
     const days = [];
-    const dayNames = ["S", "M", "T", "W", "T", "F", "S"];
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     for (let i = 0; i < 7; i++) {
       const date = new Date();

@@ -1,37 +1,83 @@
-import { StyleSheet, View, ScrollView } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
-import { DefaultButton } from "@/components/buttons/DefaultButton";
-import { router } from "expo-router";
+import { ThemedText } from "@/components/ThemedText";
 import { Header } from "@/components/Header";
+import { PillVertical } from "@/components/PillVertical";
+import { useColorScheme } from "react-native";
+import { Colors } from "@/constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
+  const colorScheme = useColorScheme() ?? "light";
+  const theme = Colors[colorScheme];
+
   return (
     <ThemedView style={styles.container}>
+      <Header title="Home" showBackButton={false} />
+
       <View style={styles.content}>
-        <Header title="Home" showBackButton={false} />
+        <View style={styles.headerContainer}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            Your Daily Insights
+          </ThemedText>
+          <View
+            style={[styles.divider, { backgroundColor: theme.tabIconDefault }]}
+          />
+        </View>
 
-        <ScrollView style={styles.buttonContainer}>
-          <DefaultButton
-            onPress={() => router.push("/Home/cycleInsights")}
-            style={styles.button}
+        <View style={styles.pillsContainer}>
+          <PillVertical
+            title="Cycle day"
+            backgroundColor={theme.red}
+            titleColor={theme.white}
           >
-            Cycle Insights
-          </DefaultButton>
+            <ThemedText
+              type="title"
+              style={{ color: theme.white, fontSize: 32 }}
+            >
+              18
+            </ThemedText>
+          </PillVertical>
 
-          <DefaultButton
-            onPress={() => router.push("/Home/ovulationDetails")}
-            style={styles.button}
+          <PillVertical
+            title="Ovulation Day"
+            backgroundColor={theme.blue}
+            titleColor={theme.white}
           >
-            Ovulation Details
-          </DefaultButton>
+            <ThemedText
+              type="title"
+              style={{ color: theme.white, fontSize: 32 }}
+            >
+              3
+            </ThemedText>
+          </PillVertical>
 
-          <DefaultButton
-            onPress={() => router.push("/Home/symptomDetails")}
-            style={styles.button}
+          <PillVertical
+            title="Symptoms"
+            backgroundColor={theme.buttonBackground}
           >
-            Symptom Details
-          </DefaultButton>
-        </ScrollView>
+            <View style={styles.symptomsContainer}>
+              <View
+                style={[styles.symptomIcon, { backgroundColor: theme.red }]}
+              >
+                <Ionicons name="heart" size={16} color={theme.white} />
+              </View>
+              <View
+                style={[styles.symptomIcon, { backgroundColor: theme.blue }]}
+              >
+                <Ionicons name="add" size={16} color={theme.white} />
+              </View>
+            </View>
+          </PillVertical>
+
+          <PillVertical
+            title="Add Info"
+            backgroundColor={theme.yellow}
+            titleColor={theme.white}
+          >
+            <Ionicons name="add" size={32} color={theme.white} />
+          </PillVertical>
+        </View>
       </View>
     </ThemedView>
   );
@@ -44,17 +90,34 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
-    justifyContent: "flex-start",
-    paddingTop: 60,
+    paddingTop: 120,
   },
-  title: {
-    marginBottom: 30,
+  headerContainer: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
     textAlign: "center",
+    marginBottom: 8,
   },
-  buttonContainer: {
-    flex: 1,
+  divider: {
+    height: 1,
+    width: "100%",
+    opacity: 0.5,
   },
-  button: {
-    marginBottom: 16,
+  pillsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  symptomsContainer: {
+    flexDirection: "row",
+    gap: 4,
+  },
+  symptomIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

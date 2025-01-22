@@ -8,6 +8,7 @@ interface PillVerticalProps {
   style?: ViewStyle;
   backgroundColor?: string;
   titleColor?: string;
+  contentTextStyle?: ViewStyle;
 }
 
 export const PillVertical: React.FC<PillVerticalProps> = ({
@@ -16,6 +17,7 @@ export const PillVertical: React.FC<PillVerticalProps> = ({
   style,
   backgroundColor,
   titleColor,
+  contentTextStyle,
 }) => {
   return (
     <View
@@ -28,6 +30,7 @@ export const PillVertical: React.FC<PillVerticalProps> = ({
       <ThemedText
         type="defaultSemiBold"
         style={[styles.title, titleColor ? { color: titleColor } : {}]}
+        numberOfLines={2}
       >
         {title}
       </ThemedText>
@@ -38,17 +41,19 @@ export const PillVertical: React.FC<PillVerticalProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 0,
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
     minHeight: 120,
     width: "23%",
+    paddingHorizontal: 4,
   },
   title: {
     fontSize: 12,
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: 4,
+    lineHeight: 14,
   },
   content: {
     alignItems: "center",

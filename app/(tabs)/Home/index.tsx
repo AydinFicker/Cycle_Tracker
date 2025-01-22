@@ -33,7 +33,7 @@ export default function HomeScreen() {
           >
             <ThemedText
               type="title"
-              style={{ color: theme.white, fontSize: 32 }}
+              style={[styles.pillContent, { color: theme.white }]}
             >
               18
             </ThemedText>
@@ -46,7 +46,7 @@ export default function HomeScreen() {
           >
             <ThemedText
               type="title"
-              style={{ color: theme.white, fontSize: 32 }}
+              style={[styles.pillContent, { color: theme.white }]}
             >
               3
             </ThemedText>
@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
   symptomsContainer: {
     flexDirection: "row",
     gap: 4,
+    paddingTop: 12,
   },
   symptomIcon: {
     width: 24,
@@ -119,5 +120,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+  },
+  pillContent: {
+    fontSize: 32,
+    paddingTop: 6,
   },
 });

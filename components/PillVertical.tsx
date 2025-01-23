@@ -1,6 +1,8 @@
 import React, { ReactNode } from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
 import { ThemedText } from "./ThemedText";
+import { opacity } from "react-native-reanimated/lib/typescript/Colors";
+import { router } from "expo-router";
 
 interface PillVerticalProps {
   title: string;
@@ -9,6 +11,7 @@ interface PillVerticalProps {
   backgroundColor?: string;
   titleColor?: string;
   contentTextStyle?: ViewStyle;
+  href?: string;
 }
 
 export const PillVertical: React.FC<PillVerticalProps> = ({
@@ -18,14 +21,17 @@ export const PillVertical: React.FC<PillVerticalProps> = ({
   backgroundColor,
   titleColor,
   contentTextStyle,
+  href = "/(tabs)/Home",
 }) => {
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.7}
       style={[
         styles.container,
         backgroundColor ? { backgroundColor } : {},
         style,
       ]}
+      onPress={() => router.push(href as any)}
     >
       <ThemedText
         type="defaultSemiBold"
@@ -35,7 +41,7 @@ export const PillVertical: React.FC<PillVerticalProps> = ({
         {title}
       </ThemedText>
       <View style={styles.content}>{children}</View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

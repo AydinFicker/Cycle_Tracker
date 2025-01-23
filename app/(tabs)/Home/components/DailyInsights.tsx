@@ -25,6 +25,7 @@ export const DailyInsights = () => {
           title="Cycle day"
           backgroundColor={theme.red}
           titleColor={theme.white}
+          href="/(tabs)/Home/cycleInsights"
         >
           <ThemedText
             type="title"
@@ -38,6 +39,7 @@ export const DailyInsights = () => {
           title="Ovulation Day"
           backgroundColor={theme.blue}
           titleColor={theme.white}
+          href="/(tabs)/Home/ovulationDetails"
         >
           <ThemedText
             type="title"
@@ -47,7 +49,11 @@ export const DailyInsights = () => {
           </ThemedText>
         </PillVertical>
 
-        <PillVertical title="Symptoms" backgroundColor={theme.buttonBackground}>
+        <PillVertical
+          title="Symptoms"
+          backgroundColor={theme.buttonBackground}
+          href="/(tabs)/Home/symptomDetails"
+        >
           <View style={styles.symptomsContainer}>
             <View style={[styles.symptomIcon, { backgroundColor: theme.red }]}>
               <Ionicons name="heart" size={16} color={theme.white} />

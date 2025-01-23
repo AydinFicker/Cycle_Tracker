@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Animated, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
@@ -8,23 +8,56 @@ export const PeriodCountdown = () => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
+  // Animation value for scaling
+  const scale = React.useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 1.15,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
     <View style={styles.container}>
       <View style={[styles.circle, { borderColor: theme.red40 }]}>
-        <View style={[styles.innerCircle, { backgroundColor: theme.red }]}>
-          <ThemedText style={styles.title}>Your period starts in</ThemedText>
-          <View style={styles.daysContainer}>
-            <ThemedText
-              style={[styles.days, { color: theme.white }]}
-              adjustsFontSizeToFit
-            >
-              4 Days
-            </ThemedText>
-          </View>
-          <View style={[styles.divider, { backgroundColor: theme.white }]} />
-          <ThemedText style={styles.phase}>Currently in the</ThemedText>
-          <ThemedText style={styles.phaseType}>Ovulation Phase</ThemedText>
-        </View>
+        <Animated.View
+          style={[
+            styles.innerCircle,
+            { backgroundColor: theme.red },
+            { transform: [{ scale }] },
+          ]}
+        >
+          <Animated.View
+            style={styles.content}
+            onTouchStart={handlePressIn}
+            onTouchEnd={handlePressOut}
+          >
+            <ThemedText style={styles.title}>Your period starts in</ThemedText>
+            <View style={styles.daysContainer}>
+              <ThemedText
+                style={[styles.days, { color: theme.white }]}
+                adjustsFontSizeToFit
+              >
+                4 Days
+              </ThemedText>
+            </View>
+            <View style={[styles.divider, { backgroundColor: theme.white }]} />
+            <ThemedText style={styles.phase}>Currently in the</ThemedText>
+            <ThemedText style={styles.phaseType}>Ovulation Phase</ThemedText>
+          </Animated.View>
+        </Animated.View>
       </View>
     </View>
   );
@@ -50,6 +83,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 120,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  content: {
+    width: "100%",
+    height: "100%",
     alignItems: "center",
     justifyContent: "center",
   },

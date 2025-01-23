@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   days: {
     fontSize: 36,
     fontWeight: "400",
-    lineHeight: 64,
+    lineHeight: 36,
     includeFontPadding: false,
     textAlignVertical: "center",
   },

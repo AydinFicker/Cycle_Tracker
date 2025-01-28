@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   daysContainer: {
     alignItems: "center",
     justifyContent: "center",
-    height: 65,
+    height: 55,
   },
   days: {
     fontSize: 36,

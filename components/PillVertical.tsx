@@ -12,6 +12,7 @@ interface PillVerticalProps {
   titleColor?: string;
   contentTextStyle?: ViewStyle;
   href?: string;
+  onPress?: () => void;
 }
 
 export const PillVertical: React.FC<PillVerticalProps> = ({
@@ -21,8 +22,17 @@ export const PillVertical: React.FC<PillVerticalProps> = ({
   backgroundColor,
   titleColor,
   contentTextStyle,
-  href = "/(tabs)/Home",
+  href,
+  onPress,
 }) => {
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else if (href) {
+      router.push(href as any);
+    }
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={0.7}
@@ -31,7 +41,7 @@ export const PillVertical: React.FC<PillVerticalProps> = ({
         backgroundColor ? { backgroundColor } : {},
         style,
       ]}
-      onPress={() => router.push(href as any)}
+      onPress={handlePress}
     >
       <ThemedText
         type="defaultSemiBold"

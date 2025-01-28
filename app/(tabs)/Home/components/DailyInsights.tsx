@@ -1,3 +1,4 @@
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { PillVertical } from "@/components/PillVertical";
@@ -5,9 +6,20 @@ import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 
-export const DailyInsights = () => {
+interface DailyInsightsProps {
+  onAddInfoPress: () => void;
+}
+
+export const DailyInsights: React.FC<DailyInsightsProps> = ({
+  onAddInfoPress,
+}) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+
+  const handleAddPress = () => {
+    console.log("DailyInsights: Add Info pressed");
+    onAddInfoPress();
+  };
 
   return (
     <View style={styles.container}>
@@ -68,6 +80,7 @@ export const DailyInsights = () => {
           title="Add Info"
           backgroundColor={theme.yellow}
           titleColor={theme.white}
+          onPress={handleAddPress}
         >
           <Ionicons name="add" size={32} color={theme.white} />
         </PillVertical>

@@ -14,7 +14,6 @@ export default function HomeScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const handleAddInfoPress = useCallback(() => {
-    console.log("Pressing add info");
     if (bottomSheetRef.current) {
       try {
         bottomSheetRef.current.snapToIndex(1);

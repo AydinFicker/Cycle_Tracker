@@ -15,7 +15,6 @@ const DailyInsights: React.FC<DailyInsightsProps> = ({ onAddInfoPress }) => {
   const theme = Colors[colorScheme];
 
   const handleAddPress = () => {
-    console.log("DailyInsights: Add Info pressed");
     onAddInfoPress();
   };
 
@@ -75,7 +74,7 @@ const DailyInsights: React.FC<DailyInsightsProps> = ({ onAddInfoPress }) => {
         </PillVertical>
 
         <PillVertical
-          title="Add Info"
+          title="Log your symptoms"
           backgroundColor={theme.yellow}
           titleColor={theme.white}
           onPress={handleAddPress}

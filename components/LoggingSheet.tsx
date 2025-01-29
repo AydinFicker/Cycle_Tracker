@@ -1,6 +1,9 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
@@ -8,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LOGGING_CATEGORIES } from "@/constants/LoggingOptions";
 import { LoggingCategory } from "./logging/LoggingCategory";
 import { LoggingData } from "@/types/logging";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -22,9 +26,10 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const theme = Colors[colorScheme];
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const insets = useSafeAreaInsets();
 
   // variables
-  const snapPoints = useMemo(() => ["95%"], []);
+  const snapPoints = useMemo(() => ["90%"], []);
 
   // callbacks
   const handleSheetChange = useCallback(
@@ -45,6 +50,17 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
     });
   }, []);
 
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+      />
+    ),
+    []
+  );
+
   const filteredCategories = useMemo(() => {
     if (!searchQuery) return LOGGING_CATEGORIES;
 
@@ -63,40 +79,46 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
       snapPoints={snapPoints}
       onChange={handleSheetChange}
       enablePanDownToClose
+      backdropComponent={renderBackdrop}
       backgroundStyle={{ backgroundColor: theme.background }}
       handleIndicatorStyle={{ backgroundColor: theme.text }}
+      topInset={insets.top}
+      style={styles.bottomSheet}
     >
-      <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <ThemedText type="title">Today</ThemedText>
-            <ThemedText style={styles.cycleDay}>Cycle day 23</ThemedText>
-          </View>
-          <View style={styles.searchContainer}>
-            <Ionicons
-              name="search"
-              size={20}
-              color={theme.text}
-              style={styles.searchIcon}
-            />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor={theme.tabIconDefault}
-              style={[styles.searchInput, { color: theme.text }]}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-          <View style={styles.dataProtection}>
-            <Ionicons name="shield-checkmark" size={20} color={theme.tint} />
-            <ThemedText style={styles.protectionText}>
-              Your data is protected
-            </ThemedText>
-          </View>
+      {/* Sticky Header */}
+      <View style={[styles.header, { backgroundColor: theme.background }]}>
+        <View style={styles.headerTop}>
+          <ThemedText type="title">Today</ThemedText>
+          <ThemedText style={styles.cycleDay}>Cycle day 23</ThemedText>
         </View>
+        <View style={styles.searchContainer}>
+          <Ionicons
+            name="search"
+            size={20}
+            color={theme.text}
+            style={styles.searchIcon}
+          />
+          <TextInput
+            placeholder="Search"
+            placeholderTextColor={theme.tabIconDefault}
+            style={[styles.searchInput, { color: theme.text }]}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+        <View style={styles.dataProtection}>
+          <Ionicons name="shield-checkmark" size={20} color={theme.tint} />
+          <ThemedText style={styles.protectionText}>
+            Your data is protected
+          </ThemedText>
+        </View>
+      </View>
 
-        {/* Categories */}
+      {/* Scrollable Content */}
+      <BottomSheetScrollView
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.categoriesContainer}>
           <View style={styles.categoryHeader}>
             <ThemedText type="title" style={styles.categoryTitle}>
@@ -120,11 +142,21 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
 };
 
 const styles = StyleSheet.create({
-  contentContainer: {
-    flexGrow: 1,
+  bottomSheet: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   header: {
     padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.1)",
+    zIndex: 1,
   },
   headerTop: {
     alignItems: "center",
@@ -155,12 +187,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 4,
   },
   protectionText: {
     marginLeft: 8,
     fontSize: 14,
     opacity: 0.7,
+  },
+  contentContainer: {
+    flexGrow: 1,
   },
   categoriesContainer: {
     padding: 20,

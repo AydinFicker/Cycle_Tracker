@@ -1,8 +1,8 @@
 import { StyleSheet, View } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
-import { DailyInsights } from "./components/DailyInsights";
-import { WeeklyCalendar } from "./components/WeeklyCalendar";
-import { PeriodCountdown } from "./components/PeriodCountdown";
+import DailyInsights from "./components/DailyInsights";
+import WeeklyCalendar from "./components/WeeklyCalendar";
+import PeriodCountdown from "./components/PeriodCountdown";
 import { ThemedText } from "@/components/ThemedText";
 import { HomeIndexBackground } from "@/components/backgrounds/HomeIndexBackground";
 import { GestureHandlerRootView } from "react-native-gesture-handler";

@@ -10,9 +10,7 @@ interface DailyInsightsProps {
   onAddInfoPress: () => void;
 }
 
-export const DailyInsights: React.FC<DailyInsightsProps> = ({
-  onAddInfoPress,
-}) => {
+const DailyInsights: React.FC<DailyInsightsProps> = ({ onAddInfoPress }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
@@ -127,3 +125,5 @@ const styles = StyleSheet.create({
     paddingTop: 6,
   },
 });
+
+export default DailyInsights;

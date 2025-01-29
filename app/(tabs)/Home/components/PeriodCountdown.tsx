@@ -4,7 +4,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
 
-export const PeriodCountdown = () => {
+const PeriodCountdown: React.FC = () => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
@@ -125,3 +125,5 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 });
+
+export default PeriodCountdown;

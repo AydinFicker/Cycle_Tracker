@@ -1,10 +1,13 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { LOGGING_CATEGORIES } from "@/constants/LoggingOptions";
+import { LoggingCategory } from "./logging/LoggingCategory";
+import { LoggingData } from "@/types/logging";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -17,6 +20,8 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // variables
   const snapPoints = useMemo(() => ["95%"], []);
@@ -24,13 +29,32 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   // callbacks
   const handleSheetChange = useCallback(
     (index: number) => {
-      //   console.log("handleSheetChange", index);
       if (index === -1) {
         onClose();
       }
     },
     [onClose]
   );
+
+  const handleOptionPress = useCallback((id: string) => {
+    setSelectedOptions((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((optionId) => optionId !== id);
+      }
+      return [...prev, id];
+    });
+  }, []);
+
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery) return LOGGING_CATEGORIES;
+
+    return LOGGING_CATEGORIES.map((category) => ({
+      ...category,
+      options: category.options.filter((option) =>
+        option.label.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    })).filter((category) => category.options.length > 0);
+  }, [searchQuery]);
 
   return (
     <BottomSheet
@@ -60,6 +84,8 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
               placeholder="Search"
               placeholderTextColor={theme.tabIconDefault}
               style={[styles.searchInput, { color: theme.text }]}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
             />
           </View>
           <View style={styles.dataProtection}>
@@ -79,62 +105,14 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
             <ThemedText style={styles.editButton}>Edit</ThemedText>
           </View>
 
-          {/* Ovulation Section */}
-          <View style={styles.category}>
-            <View style={styles.categoryTitleRow}>
-              <ThemedText type="subtitle">Ovulation test</ThemedText>
-              <View style={styles.tutorialButton}>
-                <ThemedText style={{ color: theme.tint }}>Tutorial</ThemedText>
-                <Ionicons name="play-circle" size={16} color={theme.tint} />
-              </View>
-            </View>
-            <ThemedText style={styles.categoryDescription}>
-              Log them to know when you ovulate
-            </ThemedText>
-            <View style={styles.optionsContainer}>
-              <View
-                style={[styles.option, { backgroundColor: theme.tint + "20" }]}
-              >
-                <Ionicons
-                  name="add-circle-outline"
-                  size={24}
-                  color={theme.tint}
-                />
-                <ThemedText style={styles.optionText}>
-                  Log ovulation test
-                </ThemedText>
-                <Ionicons name="add" size={24} color={theme.tint} />
-              </View>
-              <View
-                style={[styles.option, { backgroundColor: theme.tint + "20" }]}
-              >
-                <Ionicons
-                  name="close-circle-outline"
-                  size={24}
-                  color={theme.tint}
-                />
-                <ThemedText style={styles.optionText}>
-                  Didn't take tests
-                </ThemedText>
-              </View>
-              <View
-                style={[styles.option, { backgroundColor: theme.tint + "20" }]}
-              >
-                <Ionicons name="options-outline" size={24} color={theme.tint} />
-                <ThemedText style={styles.optionText}>
-                  Ovulation: My method
-                </ThemedText>
-              </View>
-            </View>
-          </View>
-
-          {/* Sex and Sex Drive Section */}
-          <View style={styles.category}>
-            <ThemedText type="subtitle">Sex and sex drive</ThemedText>
-            <View style={styles.optionsGrid}>
-              {/* Add your sex-related options here similar to the image */}
-            </View>
-          </View>
+          {filteredCategories.map((category) => (
+            <LoggingCategory
+              key={category.id}
+              category={category}
+              selectedOptions={selectedOptions}
+              onOptionPress={handleOptionPress}
+            />
+          ))}
         </View>
       </BottomSheetScrollView>
     </BottomSheet>
@@ -199,43 +177,5 @@ const styles = StyleSheet.create({
   editButton: {
     color: "#FF69B4",
     fontSize: 16,
-  },
-  category: {
-    marginBottom: 24,
-  },
-  categoryTitleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  tutorialButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  categoryDescription: {
-    opacity: 0.7,
-    marginBottom: 16,
-  },
-  optionsContainer: {
-    gap: 12,
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 12,
-    gap: 12,
-  },
-  optionText: {
-    flex: 1,
-    fontSize: 16,
-  },
-  optionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    marginTop: 12,
   },
 });

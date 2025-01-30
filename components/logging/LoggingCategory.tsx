@@ -1,9 +1,10 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { LoggingCategory as LoggingCategoryType } from "@/types/logging";
 import { LoggingOption } from "./LoggingOption";
 import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "@/constants/Colors";
 
 interface LoggingCategoryProps {
   category: LoggingCategoryType;
@@ -16,41 +17,49 @@ export const LoggingCategory: React.FC<LoggingCategoryProps> = ({
   selectedOptions,
   onOptionPress,
 }) => {
+  const colorScheme = useColorScheme() ?? "light";
+  const theme = Colors[colorScheme];
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <ThemedText type="subtitle" style={styles.title}>
-          {category.title}
-        </ThemedText>
-        {category.hasTutorial && (
-          <View style={styles.tutorialButton}>
-            <ThemedText style={styles.tutorialText}>Tutorial</ThemedText>
-            <Ionicons name="play-circle" size={16} color="#007AFF" />
-          </View>
-        )}
-      </View>
-
-      {category.description && (
-        <ThemedText style={styles.description}>
-          {category.description}
-        </ThemedText>
-      )}
-
       <View
-        style={[
-          styles.optionsContainer,
-          category.isGrid && styles.gridContainer,
-        ]}
+        style={[styles.contentContainer, { backgroundColor: theme.background }]}
       >
-        {category.options.map((option) => (
-          <LoggingOption
-            key={option.id}
-            option={option}
-            isSelected={selectedOptions.includes(option.id)}
-            isGrid={category.isGrid}
-            onPress={onOptionPress}
-          />
-        ))}
+        <View style={styles.header}>
+          <ThemedText type="subtitle" style={styles.title}>
+            {category.title}
+          </ThemedText>
+          {category.hasTutorial && (
+            <View style={styles.tutorialButton}>
+              <ThemedText style={[styles.tutorialText, { color: theme.tint }]}>
+                Tutorial
+              </ThemedText>
+              <Ionicons name="play-circle" size={16} color={theme.tint} />
+            </View>
+          )}
+        </View>
+
+        {category.description && (
+          <ThemedText style={styles.description}>
+            {category.description}
+          </ThemedText>
+        )}
+
+        <View
+          style={[
+            styles.optionsContainer,
+            category.isGrid && styles.gridContainer,
+          ]}
+        >
+          {category.options.map((option) => (
+            <LoggingOption
+              key={option.id}
+              option={option}
+              isSelected={selectedOptions.includes(option.id)}
+              isGrid={category.isGrid}
+              onPress={onOptionPress}
+            />
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -58,7 +67,19 @@ export const LoggingCategory: React.FC<LoggingCategoryProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: 16,
+  },
+  contentContainer: {
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   header: {
     flexDirection: "row",
@@ -76,7 +97,6 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   tutorialText: {
-    color: "#007AFF",
     fontSize: 14,
   },
   description: {

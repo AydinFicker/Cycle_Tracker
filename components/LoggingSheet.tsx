@@ -80,18 +80,23 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
       onChange={handleSheetChange}
       enablePanDownToClose
       backdropComponent={renderBackdrop}
-      backgroundStyle={{ backgroundColor: theme.background }}
+      backgroundStyle={{ backgroundColor: theme.modalBackground }}
       handleIndicatorStyle={{ backgroundColor: theme.text }}
       topInset={insets.top}
       style={styles.bottomSheet}
     >
       {/* Sticky Header */}
-      <View style={[styles.header, { backgroundColor: theme.background }]}>
+      <View style={[styles.header, { backgroundColor: theme.modalBackground }]}>
         <View style={styles.headerTop}>
           <ThemedText type="title">Today</ThemedText>
           <ThemedText style={styles.cycleDay}>Cycle day 23</ThemedText>
         </View>
-        <View style={styles.searchContainer}>
+        <View
+          style={[
+            styles.searchContainer,
+            { backgroundColor: theme.background },
+          ]}
+        >
           <Ionicons
             name="search"
             size={20}

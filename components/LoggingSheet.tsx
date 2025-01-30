@@ -12,6 +12,7 @@ import { LOGGING_CATEGORIES } from "@/constants/LoggingOptions";
 import { LoggingCategory } from "./logging/LoggingCategory";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
+import { FullButton } from "@/components/buttons/FullButton";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -25,7 +26,9 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const navigation = useNavigation();
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<{
+    [key: string]: string[];
+  }>({});
   const [searchQuery, setSearchQuery] = useState("");
   const insets = useSafeAreaInsets();
 
@@ -56,14 +59,50 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
     [onClose, navigation]
   );
 
-  const handleOptionPress = useCallback((id: string) => {
-    setSelectedOptions((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((optionId) => optionId !== id);
-      }
-      return [...prev, id];
-    });
-  }, []);
+  const handleOptionPress = useCallback(
+    (categoryId: string, optionId: string) => {
+      setSelectedOptions((prev) => {
+        const currentSelected = prev[categoryId] || [];
+        const isAlreadySelected = currentSelected.includes(optionId);
+
+        if (isAlreadySelected) {
+          // Remove the option if it's already selected
+          const newSelected = currentSelected.filter((id) => id !== optionId);
+          const newState = { ...prev };
+          if (newSelected.length === 0) {
+            delete newState[categoryId];
+          } else {
+            newState[categoryId] = newSelected;
+          }
+          return newState;
+        } else {
+          // Add the option if it's not selected
+          return {
+            ...prev,
+            [categoryId]: [...currentSelected, optionId],
+          };
+        }
+      });
+    },
+    []
+  );
+
+  const handleApply = useCallback(
+    (categoryId: string) => {
+      // Handle applying the selected options
+      console.log(
+        "Applying options for category:",
+        categoryId,
+        selectedOptions[categoryId]
+      );
+      // Clear selections for this category after applying
+      setSelectedOptions((prev) => ({
+        ...prev,
+        [categoryId]: [],
+      }));
+    },
+    [selectedOptions]
+  );
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -101,63 +140,91 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
       topInset={insets.top}
       style={styles.bottomSheet}
     >
-      {/* Sticky Header */}
-      <View style={[styles.header, { backgroundColor: theme.modalBackground }]}>
-        <View style={styles.headerTop}>
-          <ThemedText type="title">Today</ThemedText>
-          <ThemedText style={styles.cycleDay}>Cycle day 23</ThemedText>
-        </View>
+      <View style={{ flex: 1 }}>
+        {/* Sticky Header */}
         <View
-          style={[
-            styles.searchContainer,
-            { backgroundColor: theme.background },
-          ]}
+          style={[styles.header, { backgroundColor: theme.modalBackground }]}
         >
-          <Ionicons
-            name="search"
-            size={20}
-            color={theme.text}
-            style={styles.searchIcon}
-          />
-          <TextInput
-            placeholder="Search"
-            placeholderTextColor={theme.tabIconDefault}
-            style={[styles.searchInput, { color: theme.text }]}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-        <View style={styles.dataProtection}>
-          <Ionicons name="shield-checkmark" size={20} color={theme.tint} />
-          <ThemedText style={styles.protectionText}>
-            Your data is protected
-          </ThemedText>
-        </View>
-      </View>
-
-      {/* Scrollable Content */}
-      <BottomSheetScrollView
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.categoriesContainer}>
-          <View style={styles.categoryHeader}>
-            <ThemedText type="title" style={styles.categoryTitle}>
-              Categories
-            </ThemedText>
-            <ThemedText style={styles.editButton}>Edit</ThemedText>
+          <View style={styles.headerTop}>
+            <ThemedText type="title">Today</ThemedText>
+            <ThemedText style={styles.cycleDay}>Cycle day 23</ThemedText>
           </View>
-
-          {filteredCategories.map((category) => (
-            <LoggingCategory
-              key={category.id}
-              category={category}
-              selectedOptions={selectedOptions}
-              onOptionPress={handleOptionPress}
+          <View
+            style={[
+              styles.searchContainer,
+              { backgroundColor: theme.background },
+            ]}
+          >
+            <Ionicons
+              name="search"
+              size={20}
+              color={theme.text}
+              style={styles.searchIcon}
             />
-          ))}
+            <TextInput
+              placeholder="Search"
+              placeholderTextColor={theme.tabIconDefault}
+              style={[styles.searchInput, { color: theme.text }]}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+          <View style={styles.dataProtection}>
+            <Ionicons name="shield-checkmark" size={20} color={theme.tint} />
+            <ThemedText style={styles.protectionText}>
+              Your data is protected
+            </ThemedText>
+          </View>
         </View>
-      </BottomSheetScrollView>
+
+        {/* Scrollable Content */}
+        <BottomSheetScrollView
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.categoriesContainer}>
+            <View style={styles.categoryHeader}>
+              <ThemedText type="title" style={styles.categoryTitle}>
+                Categories
+              </ThemedText>
+              <ThemedText style={styles.editButton}>Edit</ThemedText>
+            </View>
+
+            {filteredCategories.map((category) => (
+              <LoggingCategory
+                key={category.id}
+                category={category}
+                selectedOptions={selectedOptions[category.id] || []}
+                onOptionPress={(optionId) =>
+                  handleOptionPress(category.id, optionId)
+                }
+              />
+            ))}
+          </View>
+        </BottomSheetScrollView>
+
+        {/* Global Apply Button */}
+        {Object.keys(selectedOptions).length > 0 && (
+          <View
+            style={[
+              styles.applyButtonContainer,
+              { backgroundColor: theme.modalBackground },
+            ]}
+          >
+            <FullButton
+              onPress={() => {
+                // Handle applying all selected options
+                console.log("Applying all selections:", selectedOptions);
+                setSelectedOptions({});
+              }}
+              defaultColor={theme.tint}
+              defaultTextColor={theme.white}
+            >
+              Apply
+            </FullButton>
+          </View>
+        )}
+      </View>
     </BottomSheet>
   );
 };
@@ -224,5 +291,11 @@ const styles = StyleSheet.create({
   editButton: {
     color: "#FF69B4",
     fontSize: 16,
+  },
+  applyButtonContainer: {
+    padding: 16,
+    paddingBottom: 32,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.1)",
   },
 });

@@ -5,20 +5,24 @@ import { LoggingCategory as LoggingCategoryType } from "@/types/logging";
 import { LoggingOption } from "./LoggingOption";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
+import { FullButton } from "../buttons/FullButton";
 
 interface LoggingCategoryProps {
   category: LoggingCategoryType;
   selectedOptions: string[];
   onOptionPress: (id: string) => void;
+  onApply?: () => void;
 }
 
 export const LoggingCategory: React.FC<LoggingCategoryProps> = ({
   category,
   selectedOptions,
   onOptionPress,
+  onApply,
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+
   return (
     <View style={styles.container}>
       <View
@@ -49,9 +53,22 @@ export const LoggingCategory: React.FC<LoggingCategoryProps> = ({
               isSelected={selectedOptions.includes(option.id)}
               isGrid={category.isGrid}
               onPress={onOptionPress}
+              categoryBackgroundColor={category.backgroundColor}
             />
           ))}
         </View>
+
+        {selectedOptions.length > 0 && onApply && (
+          <View style={styles.applyButtonContainer}>
+            <FullButton
+              onPress={onApply}
+              defaultColor={theme.tint}
+              defaultTextColor={theme.white}
+            >
+              Apply
+            </FullButton>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -95,5 +112,8 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "flex-start",
     marginHorizontal: -4,
+  },
+  applyButtonContainer: {
+    marginTop: 16,
   },
 });

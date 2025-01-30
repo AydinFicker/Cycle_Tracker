@@ -9,6 +9,7 @@ interface LoggingOptionProps {
   isSelected?: boolean;
   isGrid?: boolean;
   onPress: (id: string) => void;
+  categoryBackgroundColor: string;
 }
 
 export const LoggingOption: React.FC<LoggingOptionProps> = ({
@@ -16,13 +17,18 @@ export const LoggingOption: React.FC<LoggingOptionProps> = ({
   isSelected = false,
   isGrid = false,
   onPress,
+  categoryBackgroundColor,
 }) => {
   return (
     <Pressable
       style={[
         styles.container,
         isGrid ? styles.gridItem : styles.listItem,
-        { backgroundColor: option.backgroundColor },
+        {
+          backgroundColor: isSelected
+            ? categoryBackgroundColor
+            : option.backgroundColor,
+        },
         isSelected && styles.selected,
       ]}
       onPress={() => onPress(option.id)}
@@ -44,6 +50,11 @@ export const LoggingOption: React.FC<LoggingOptionProps> = ({
           <Ionicons name="add" size={24} color={option.textColor || "#000"} />
         </View>
       )}
+      {isSelected && (
+        <View style={styles.checkmarkContainer}>
+          <Ionicons name="checkmark-circle" size={20} color="#000" />
+        </View>
+      )}
     </Pressable>
   );
 };
@@ -55,6 +66,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     opacity: 0.8,
     minHeight: 44,
+    position: "relative",
   },
   listItem: {
     padding: 12,
@@ -72,7 +84,8 @@ const styles = StyleSheet.create({
   },
   selected: {
     opacity: 1,
-    transform: [{ scale: 1.02 }],
+    borderWidth: 2,
+    borderColor: "rgba(0,0,0,0.1)",
   },
   iconContainer: {
     marginRight: 8,
@@ -101,5 +114,13 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     flexShrink: 1,
     flexWrap: "wrap",
+  },
+  checkmarkContainer: {
+    position: "absolute",
+    bottom: -8,
+    right: -8,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 0,
   },
 });

@@ -10,8 +10,8 @@ import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { LOGGING_CATEGORIES } from "@/constants/LoggingOptions";
 import { LoggingCategory } from "./logging/LoggingCategory";
-import { LoggingData } from "@/types/logging";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation } from "expo-router";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -22,6 +22,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   bottomSheetRef,
   onClose,
 }) => {
+  const navigation = useNavigation();
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -31,14 +32,28 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   // variables
   const snapPoints = useMemo(() => ["90%"], []);
 
-  // callbacks
+  // Show tab bar when sheet is dragged down 30%
+  const handleSheetAnimate = useCallback(
+    (_: number, toIndex: number) => {
+      if (toIndex < 0.7) {
+        navigation.getParent()?.setOptions({
+          tabBarStyle: undefined,
+        });
+      }
+    },
+    [navigation]
+  );
+
   const handleSheetChange = useCallback(
     (index: number) => {
       if (index === -1) {
+        navigation.getParent()?.setOptions({
+          tabBarStyle: undefined,
+        });
         onClose();
       }
     },
-    [onClose]
+    [onClose, navigation]
   );
 
   const handleOptionPress = useCallback((id: string) => {
@@ -78,6 +93,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
       index={-1}
       snapPoints={snapPoints}
       onChange={handleSheetChange}
+      onAnimate={handleSheetAnimate}
       enablePanDownToClose
       backdropComponent={renderBackdrop}
       backgroundStyle={{ backgroundColor: theme.modalBackground }}
@@ -147,16 +163,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
 };
 
 const styles = StyleSheet.create({
-  bottomSheet: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
+  bottomSheet: {},
   header: {
     padding: 20,
     borderBottomWidth: 1,

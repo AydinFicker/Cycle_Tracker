@@ -12,7 +12,6 @@ export interface LoggingCategory {
   title: string;
   description?: string;
   backgroundColor: string;
-  hasTutorial?: boolean;
   isGrid?: boolean;
   options: LoggingOption[];
 }

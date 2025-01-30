@@ -28,14 +28,6 @@ export const LoggingCategory: React.FC<LoggingCategoryProps> = ({
           <ThemedText type="subtitle" style={styles.title}>
             {category.title}
           </ThemedText>
-          {category.hasTutorial && (
-            <View style={styles.tutorialButton}>
-              <ThemedText style={[styles.tutorialText, { color: theme.tint }]}>
-                Tutorial
-              </ThemedText>
-              <Ionicons name="play-circle" size={16} color={theme.tint} />
-            </View>
-          )}
         </View>
 
         {category.description && (
@@ -90,14 +82,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "600",
-  },
-  tutorialButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  tutorialText: {
-    fontSize: 14,
   },
   description: {
     opacity: 0.7,

@@ -5,9 +5,7 @@ export const LOGGING_CATEGORIES: LoggingCategory[] = [
   {
     id: "ovulation_test",
     title: "Ovulation test",
-    description: "Log them to know when you ovulate",
     backgroundColor: "#E0F4F4", // Light teal
-    hasTutorial: true,
     options: [
       {
         id: "log_test",
@@ -20,12 +18,6 @@ export const LOGGING_CATEGORIES: LoggingCategory[] = [
         id: "no_test",
         label: "Didn't take tests",
         icon: "close-circle-outline",
-        backgroundColor: "#E0F4F4",
-      },
-      {
-        id: "my_method",
-        label: "Ovulation: My method",
-        icon: "options-outline",
         backgroundColor: "#E0F4F4",
       },
     ],
@@ -235,7 +227,7 @@ export const LOGGING_CATEGORIES: LoggingCategory[] = [
       {
         id: "headache",
         label: "Headache",
-        icon: "head",
+        icon: "bandage",
         backgroundColor: "#F8E1F4",
       },
       {

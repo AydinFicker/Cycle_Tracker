@@ -28,17 +28,21 @@ export const LoggingOption: React.FC<LoggingOptionProps> = ({
       onPress={() => onPress(option.id)}
     >
       <View style={[styles.iconContainer, isGrid && styles.gridIcon]}>
-        <Ionicons
-          name={option.icon as any}
-          size={24}
-          color={option.textColor || "#000"}
-        />
+        <View style={styles.iconWrapper}>
+          <Ionicons
+            name={option.icon as any}
+            size={24}
+            color={option.textColor || "#000"}
+          />
+        </View>
       </View>
       <ThemedText style={[styles.label, isGrid && styles.gridLabel]}>
         {option.label}
       </ThemedText>
       {option.hasAddButton && (
-        <Ionicons name="add" size={24} color={option.textColor || "#000"} />
+        <View style={styles.iconWrapper}>
+          <Ionicons name="add" size={24} color={option.textColor || "#000"} />
+        </View>
       )}
     </Pressable>
   );
@@ -50,6 +54,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 24,
     opacity: 0.8,
+    minHeight: 44,
   },
   listItem: {
     padding: 12,
@@ -57,12 +62,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   gridItem: {
-    padding: 8,
+    padding: 12,
     marginBottom: 8,
     flex: 1,
     minWidth: "45%",
     maxWidth: "48%",
     marginHorizontal: "1%",
+    minHeight: 56,
   },
   selected: {
     opacity: 1,
@@ -70,6 +76,15 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginRight: 8,
+    width: 24,
+    height: 24,
+    flexShrink: 0,
+  },
+  iconWrapper: {
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
   },
   gridIcon: {
     marginRight: 4,
@@ -77,8 +92,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     flex: 1,
+    flexWrap: "wrap",
+    marginRight: 4,
+    lineHeight: 16,
   },
   gridLabel: {
     fontSize: 14,
+    lineHeight: 14,
+    flexShrink: 1,
+    flexWrap: "wrap",
   },
 });

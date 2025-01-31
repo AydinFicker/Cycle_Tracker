@@ -3,27 +3,46 @@ import { StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { CYCLE_DATA } from "@/constants/CycleData";
+import { isWithinInterval, addDays, parseISO } from "date-fns";
 
 const WeeklyCalendar: React.FC = () => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+  const { currentCycle } = CYCLE_DATA;
 
   // Generate array of next 7 days starting from today
   const generateWeekDays = () => {
     const days = [];
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+    const periodStart = parseISO(currentCycle.nextPeriodStart);
+    const periodEnd = addDays(periodStart, currentCycle.periodLength - 1);
+
+    const ovulationStart = parseISO(currentCycle.nextOvulationStart);
+    const ovulationEnd = addDays(
+      ovulationStart,
+      currentCycle.ovulationLength - 1
+    );
+
     for (let i = 0; i < 7; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() + i);
+      const date = addDays(new Date(), i);
+
+      const isPeriod = isWithinInterval(date, {
+        start: periodStart,
+        end: periodEnd,
+      });
+      const isOvulation = isWithinInterval(date, {
+        start: ovulationStart,
+        end: ovulationEnd,
+      });
 
       days.push({
         day: dayNames[date.getDay()],
         date: date.getDate().toString(),
         isToday: i === 0,
-        // Example period/ovulation logic - replace with actual calculation
-        isPeriod: i === 4,
-        isOvulation: i === 5,
+        isPeriod,
+        isOvulation,
       });
     }
 

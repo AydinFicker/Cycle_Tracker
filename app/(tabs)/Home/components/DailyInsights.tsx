@@ -1,9 +1,11 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import { PillVertical } from "@/components/PillVertical";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { PillVertical } from "@/components/PillVertical";
+import { CYCLE_DATA } from "@/constants/CycleData";
+import { differenceInDays } from "date-fns";
 import { Ionicons } from "@expo/vector-icons";
 
 interface DailyInsightsProps {
@@ -13,6 +15,13 @@ interface DailyInsightsProps {
 const DailyInsights: React.FC<DailyInsightsProps> = ({ onAddInfoPress }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+  const { currentCycle } = CYCLE_DATA;
+
+  // Calculate days until ovulation
+  const daysUntilOvulation = differenceInDays(
+    new Date(currentCycle.nextOvulationStart),
+    new Date()
+  );
 
   const handleAddPress = () => {
     onAddInfoPress();
@@ -40,7 +49,7 @@ const DailyInsights: React.FC<DailyInsightsProps> = ({ onAddInfoPress }) => {
             type="title"
             style={[styles.pillContent, { color: theme.white }]}
           >
-            18
+            {currentCycle.cycleDay}
           </ThemedText>
         </PillVertical>
 
@@ -54,7 +63,7 @@ const DailyInsights: React.FC<DailyInsightsProps> = ({ onAddInfoPress }) => {
             type="title"
             style={[styles.pillContent, { color: theme.white }]}
           >
-            3
+            {daysUntilOvulation}
           </ThemedText>
         </PillVertical>
 

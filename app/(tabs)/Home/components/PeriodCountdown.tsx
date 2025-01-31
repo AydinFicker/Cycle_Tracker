@@ -3,10 +3,19 @@ import { StyleSheet, Animated, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { CYCLE_DATA } from "@/constants/CycleData";
+import { differenceInDays } from "date-fns";
 
-const PeriodCountdown: React.FC = () => {
+const PeriodCountdown = () => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+  const { currentCycle } = CYCLE_DATA;
+
+  // Calculate days until period
+  const daysUntilPeriod = differenceInDays(
+    new Date(currentCycle.nextPeriodStart),
+    new Date()
+  );
 
   // Animation value for scaling
   const scale = React.useRef(new Animated.Value(1)).current;
@@ -50,12 +59,14 @@ const PeriodCountdown: React.FC = () => {
                 style={[styles.days, { color: theme.white }]}
                 adjustsFontSizeToFit
               >
-                4 Days
+                {daysUntilPeriod} Days
               </ThemedText>
             </View>
             <View style={[styles.divider, { backgroundColor: theme.white }]} />
             <ThemedText style={styles.phase}>Currently in the</ThemedText>
-            <ThemedText style={styles.phaseType}>Ovulation Phase</ThemedText>
+            <ThemedText style={styles.phaseType}>
+              {currentCycle.currentPhase}
+            </ThemedText>
           </Animated.View>
         </Animated.View>
       </View>

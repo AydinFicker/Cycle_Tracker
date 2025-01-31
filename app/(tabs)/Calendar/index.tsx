@@ -1,135 +1,61 @@
-import { StyleSheet, useColorScheme, View, Dimensions } from "react-native";
-import { Colors } from "@/constants/Colors";
+import { StyleSheet, View, useColorScheme, Dimensions } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
+import { Colors } from "@/constants/Colors";
 import { CalendarList, DateData } from "react-native-calendars";
+import { Header } from "@/components/Header";
 import { CircleLegend } from "@/components/CircleLegends";
 import { ThickIconDefaultButton } from "@/components/buttons/ThickIconDefaultButton";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { CalendarIndexBackground } from "@/components/backgrounds/CalendarIndexBackground";
-import { Header } from "@/components/Header";
+import { CYCLE_DATA } from "@/constants/CycleData";
+
+type MarkedDates = {
+  [date: string]: {
+    startingDay?: boolean;
+    endingDay?: boolean;
+    color: string;
+    textColor?: string;
+  };
+};
+
+type ThemeColor = keyof (typeof Colors)["light"];
 
 export default function CalendarScreen() {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
   const screenWidth = Dimensions.get("window").width;
+  const { currentCycle } = CYCLE_DATA;
 
   const today = new Date().toISOString().split("T")[0];
 
-  // Create base marked dates without today
-  const baseMarkedDates = {
-    // Period dates (red)
-    "2025-01-15": {
-      startingDay: true,
-      color: theme.red40,
-      ...(today === "2025-01-15" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-16": {
-      color: theme.red40,
-      ...(today === "2025-01-16" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-17": {
-      color: theme.red40,
-      ...(today === "2025-01-17" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-18": {
-      color: theme.red40,
-      ...(today === "2025-01-18" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-19": {
-      color: theme.red40,
-      ...(today === "2025-01-19" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-20": {
-      color: theme.red40,
-      ...(today === "2025-01-20" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-21": {
-      endingDay: true,
-      color: theme.red40,
-      ...(today === "2025-01-21" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    // Ovulation dates (blue)
-    "2025-01-29": {
-      startingDay: true,
-      color: theme.blue40,
-      ...(today === "2025-01-29" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-30": {
-      color: theme.blue40,
-      ...(today === "2025-01-30" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-01-31": {
-      color: theme.blue40,
-      ...(today === "2025-01-31" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-02-01": {
-      color: theme.blue40,
-      ...(today === "2025-02-01" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-02-02": {
-      color: theme.blue40,
-      ...(today === "2025-02-02" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-    "2025-02-03": {
-      endingDay: true,
-      color: theme.blue40,
-      ...(today === "2025-02-03" && {
-        color: theme.yellow40,
-        textColor: theme.white,
-      }),
-    },
-  };
-
-  // Add standalone today if it's not in any period
-  const markedDates = {
-    ...baseMarkedDates,
-    ...(!(today in baseMarkedDates) && {
-      [today]: {
-        color: theme.yellow40,
-        textColor: theme.white,
-        startingDay: true,
-        endingDay: true,
+  // Create marked dates with theme colors
+  const markedDates = Object.entries(
+    currentCycle.markedDates
+  ).reduce<MarkedDates>(
+    (acc, [date, marking]) => ({
+      ...acc,
+      [date]: {
+        ...marking,
+        color: theme[marking.color as ThemeColor] || theme.red40,
+        ...(date === today && {
+          color: theme.yellow40,
+          textColor: theme.white,
+        }),
       },
     }),
-  };
+    {}
+  );
+
+  // Add standalone today if it's not in any period
+  if (!(today in markedDates)) {
+    markedDates[today] = {
+      color: theme.yellow40,
+      textColor: theme.white,
+      startingDay: true,
+      endingDay: true,
+    };
+  }
 
   const handleDayPress = (day: DateData) => {
     console.log("selected day", day);

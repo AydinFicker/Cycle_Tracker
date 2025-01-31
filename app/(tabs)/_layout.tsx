@@ -177,5 +177,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginTop: -2,
     textAlign: "center",
+    lineHeight: 20,
   },
 });

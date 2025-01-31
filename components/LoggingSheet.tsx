@@ -263,10 +263,11 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    paddingBottom: 75,
+    paddingBottom: 100,
   },
   categoriesContainer: {
     padding: 20,
+    paddingBottom: 0,
   },
   categoryHeader: {
     flexDirection: "row",

@@ -14,11 +14,13 @@ import { Colors } from "@/constants/Colors";
 interface AnimatedApplyButtonProps {
   isVisible: boolean;
   onPress: () => void;
+  onClose: () => void;
 }
 
 export const AnimatedApplyButton: React.FC<AnimatedApplyButtonProps> = ({
   isVisible,
   onPress,
+  onClose,
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
@@ -39,8 +41,8 @@ export const AnimatedApplyButton: React.FC<AnimatedApplyButtonProps> = ({
         easing: Easing.inOut(Easing.cubic),
       });
     } else {
-      // First fade out
-      opacity.value = withTiming(0, {
+      // First fade out from 0.7
+      opacity.value = withTiming(0.7, {
         duration: 150,
         easing: Easing.inOut(Easing.cubic),
       });
@@ -62,10 +64,15 @@ export const AnimatedApplyButton: React.FC<AnimatedApplyButtonProps> = ({
     zIndex: 1000,
   }));
 
+  const handlePress = () => {
+    onPress();
+    onClose();
+  };
+
   return (
     <Animated.View style={animatedStyle}>
       <DefaultButton
-        onPress={onPress}
+        onPress={handlePress}
         defaultColor={theme.yellow}
         defaultTextColor={theme.white}
       >

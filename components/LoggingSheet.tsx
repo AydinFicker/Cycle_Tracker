@@ -211,6 +211,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
             console.log("Applying all selections:", selectedOptions);
             setSelectedOptions({});
           }}
+          onClose={onClose}
         />
       </View>
     </BottomSheet>

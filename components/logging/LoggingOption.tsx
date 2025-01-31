@@ -1,7 +1,6 @@
 import React from "react";
-import { StyleSheet, Pressable, View } from "react-native";
+import { StyleSheet, Pressable, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemedText } from "@/components/ThemedText";
 import { LoggingOption as LoggingOptionType } from "@/types/logging";
 
 interface LoggingOptionProps {
@@ -42,9 +41,11 @@ export const LoggingOption: React.FC<LoggingOptionProps> = ({
           />
         </View>
       </View>
-      <ThemedText style={[styles.label, isGrid && styles.gridLabel]}>
+      <Text
+        style={[styles.label, isGrid && styles.gridLabel, { color: "#000000" }]}
+      >
         {option.label}
-      </ThemedText>
+      </Text>
       {option.hasAddButton && (
         <View style={styles.iconWrapper}>
           <Ionicons name="add" size={24} color={option.textColor || "#000"} />

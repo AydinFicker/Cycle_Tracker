@@ -172,7 +172,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
             />
           </View>
           <View style={styles.dataProtection}>
-            <Ionicons name="shield-checkmark" size={20} color={theme.tint} />
+            <Ionicons name="shield-checkmark" size={20} color={theme.blue} />
             <ThemedText style={styles.protectionText}>
               Your data is protected
             </ThemedText>

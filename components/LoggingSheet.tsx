@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { View, StyleSheet, TextInput } from "react-native";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
+import { View, StyleSheet, TextInput, Dimensions } from "react-native";
 import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetBackdrop,
@@ -12,7 +12,7 @@ import { LOGGING_CATEGORIES } from "@/constants/LoggingOptions";
 import { LoggingCategory } from "./logging/LoggingCategory";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
-import { FullButton } from "@/components/buttons/FullButton";
+import { AnimatedApplyButton } from "./buttons/AnimatedApplyButton";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -126,6 +126,8 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
     })).filter((category) => category.options.length > 0);
   }, [searchQuery]);
 
+  const hasSelections = Object.keys(selectedOptions).length > 0;
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -203,27 +205,13 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
           </View>
         </BottomSheetScrollView>
 
-        {/* Global Apply Button */}
-        {Object.keys(selectedOptions).length > 0 && (
-          <View
-            style={[
-              styles.applyButtonContainer,
-              { backgroundColor: theme.modalBackground },
-            ]}
-          >
-            <FullButton
-              onPress={() => {
-                // Handle applying all selected options
-                console.log("Applying all selections:", selectedOptions);
-                setSelectedOptions({});
-              }}
-              defaultColor={theme.tint}
-              defaultTextColor={theme.white}
-            >
-              Apply
-            </FullButton>
-          </View>
-        )}
+        <AnimatedApplyButton
+          isVisible={hasSelections}
+          onPress={() => {
+            console.log("Applying all selections:", selectedOptions);
+            setSelectedOptions({});
+          }}
+        />
       </View>
     </BottomSheet>
   );
@@ -275,6 +263,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
+    paddingBottom: 75,
   },
   categoriesContainer: {
     padding: 20,
@@ -291,11 +280,5 @@ const styles = StyleSheet.create({
   editButton: {
     color: "#FF69B4",
     fontSize: 16,
-  },
-  applyButtonContainer: {
-    padding: 16,
-    paddingBottom: 32,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.1)",
   },
 });

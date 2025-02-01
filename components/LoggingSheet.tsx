@@ -1,5 +1,10 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { View, StyleSheet, TextInput, Dimensions } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetBackdrop,
@@ -13,6 +18,8 @@ import { LoggingCategory } from "./logging/LoggingCategory";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
 import { AnimatedApplyButton } from "./buttons/AnimatedApplyButton";
+import { format, isToday, isYesterday, isFuture } from "date-fns";
+import { CYCLE_DATA } from "@/constants/CycleData";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -26,11 +33,26 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const navigation = useNavigation();
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: string[];
   }>({});
   const [searchQuery, setSearchQuery] = useState("");
   const insets = useSafeAreaInsets();
+
+  // Format the selected date for display
+  const formattedDate = useMemo(() => {
+    if (isToday(selectedDate)) return "Today";
+    if (isYesterday(selectedDate)) return "Yesterday";
+    return format(selectedDate, "d MMM yyyy");
+  }, [selectedDate]);
+
+  // Get cycle day for selected date
+  const cycleDay = useMemo(() => {
+    if (isToday(selectedDate)) return CYCLE_DATA.currentCycle.cycleDay;
+    // TODO: Calculate cycle day for past dates when we have historical data
+    return "20"; // Placeholder
+  }, [selectedDate]);
 
   // variables
   const snapPoints = useMemo(() => ["90%"], []);
@@ -148,9 +170,44 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
           style={[styles.header, { backgroundColor: theme.modalBackground }]}
         >
           <View style={styles.headerTop}>
-            <ThemedText type="title">Today</ThemedText>
-            <ThemedText style={styles.cycleDay}>Cycle day 23</ThemedText>
+            <View style={styles.dateNavigator}>
+              <TouchableOpacity
+                onPress={() => {
+                  const newDate = new Date(selectedDate);
+                  newDate.setDate(newDate.getDate() - 1);
+                  setSelectedDate(newDate);
+                  setSelectedOptions({});
+                }}
+                style={[styles.dateArrow, styles.leftArrow]}
+              >
+                <Ionicons name="chevron-back" size={24} color={theme.text} />
+              </TouchableOpacity>
+              <ThemedText type="subtitle">{formattedDate}</ThemedText>
+              <TouchableOpacity
+                onPress={() => {
+                  const newDate = new Date(selectedDate);
+                  newDate.setDate(newDate.getDate() + 1);
+                  if (!isFuture(newDate)) {
+                    setSelectedDate(newDate);
+                    setSelectedOptions({});
+                  }
+                }}
+                style={[
+                  styles.dateArrow,
+                  styles.rightArrow,
+                  isFuture(
+                    new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000)
+                  ) && styles.dateArrowDisabled,
+                ]}
+              >
+                <Ionicons name="chevron-forward" size={24} color={theme.text} />
+              </TouchableOpacity>
+            </View>
+            <ThemedText style={styles.cycleDay}>
+              Cycle day {cycleDay}
+            </ThemedText>
           </View>
+
           <View
             style={[
               styles.searchContainer,
@@ -171,6 +228,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
               onChangeText={setSearchQuery}
             />
           </View>
+
           <View style={styles.dataProtection}>
             <Ionicons name="shield-checkmark" size={20} color={theme.blue} />
             <ThemedText style={styles.protectionText}>
@@ -221,7 +279,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
 const styles = StyleSheet.create({
   bottomSheet: {},
   header: {
-    padding: 20,
+    padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.1)",
     zIndex: 1,
@@ -229,9 +287,10 @@ const styles = StyleSheet.create({
   headerTop: {
     alignItems: "center",
     marginBottom: 16,
+    position: "relative",
   },
   cycleDay: {
-    fontSize: 16,
+    fontSize: 12,
     opacity: 0.7,
     marginTop: 4,
   },
@@ -282,5 +341,26 @@ const styles = StyleSheet.create({
   editButton: {
     color: "#FF69B4",
     fontSize: 16,
+  },
+  dateNavigator: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+  dateArrow: {
+    padding: 4,
+    position: "absolute",
+    top: "50%",
+    transform: [{ translateY: -12 }],
+  },
+  leftArrow: {
+    left: 0,
+  },
+  rightArrow: {
+    right: 0,
+  },
+  dateArrowDisabled: {
+    opacity: 0.3,
   },
 });

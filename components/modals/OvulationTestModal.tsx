@@ -3,10 +3,11 @@ import { Modal, View, StyleSheet, Pressable } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
-import { LOGGING_CATEGORIES } from "@/constants/LoggingOptions";
-import { TestType } from "@/types/logging";
 import { SmallTextButton } from "../buttons/SmallTextButton";
 import { DefaultButton } from "../buttons/DefaultButton";
+import { StripTestIcon } from "../icons/StripTestIcon";
+import { DigitalTestIcon } from "../icons/DigitalTestIcon";
+import { Ionicons } from "@expo/vector-icons";
 
 interface OvulationTestModalProps {
   isVisible: boolean;
@@ -23,30 +24,31 @@ export const OvulationTestModal: React.FC<OvulationTestModalProps> = ({
   const theme = Colors[colorScheme];
   const [selectedTestType, setSelectedTestType] = useState<string | null>(null);
   const [selectedResult, setSelectedResult] = useState<string | null>(null);
+  const [showResults, setShowResults] = useState(false);
 
-  // Get the test options from the logging categories
-  const testOptions =
-    LOGGING_CATEGORIES.find((cat) => cat.id === "ovulation_test")?.options.find(
-      (opt) => opt.id === "log_test"
-    )?.modalConfig?.options || {};
-
-  const handleSave = () => {
-    if (selectedTestType && selectedResult) {
+  const handleNext = () => {
+    if (selectedTestType && !showResults) {
+      setShowResults(true);
+    } else if (selectedTestType && selectedResult) {
       onSubmit({
         testTypeId: selectedTestType,
         resultId: selectedResult,
       });
-      onClose();
-      // Reset state after closing
+      // Reset state after submission
       setSelectedTestType(null);
       setSelectedResult(null);
+      setShowResults(false);
+      onClose();
     }
   };
 
-  const handleCancel = () => {
-    onClose();
-    setSelectedTestType(null);
-    setSelectedResult(null);
+  const handleBack = () => {
+    if (showResults) {
+      setShowResults(false);
+      setSelectedResult(null);
+    } else {
+      setSelectedTestType(null);
+    }
   };
 
   if (!isVisible) return null;
@@ -60,66 +62,134 @@ export const OvulationTestModal: React.FC<OvulationTestModalProps> = ({
             { backgroundColor: theme.modalBackground },
           ]}
         >
-          <ThemedText type="title" style={styles.title}>
-            Log Ovulation Test
-          </ThemedText>
-
-          {/* Test Type Selection */}
-          <View style={styles.section}>
-            <ThemedText style={styles.subtitle}>Test Type</ThemedText>
-            <View style={styles.optionsContainer}>
-              {Object.values(testOptions).map((testType: TestType) => (
-                <Pressable
-                  key={testType.id}
-                  style={[
-                    styles.option,
-                    selectedTestType === testType.id && styles.selectedOption,
-                    { borderColor: theme.text },
-                  ]}
-                  onPress={() => {
-                    setSelectedTestType(testType.id);
-                    setSelectedResult(null); // Reset result when changing test type
-                  }}
-                >
-                  <ThemedText>{testType.label}</ThemedText>
-                </Pressable>
-              ))}
-            </View>
+          {/* Header */}
+          <View style={styles.header}>
+            <SmallTextButton onPress={selectedTestType ? handleBack : onClose}>
+              <ThemedText style={[styles.cancelText, { color: theme.red }]}>
+                {selectedTestType ? "Back" : "Cancel"}
+              </ThemedText>
+            </SmallTextButton>
+            <ThemedText type="title" style={styles.title}>
+              Log ovulation test
+            </ThemedText>
+            <View style={styles.placeholder} />
           </View>
 
-          {/* Result Selection */}
-          {selectedTestType && (
-            <View style={styles.section}>
-              <ThemedText style={styles.subtitle}>Result</ThemedText>
-              <View style={styles.optionsContainer}>
-                {testOptions[selectedTestType].results.map((result) => (
-                  <Pressable
-                    key={result.id}
-                    style={[
-                      styles.option,
-                      selectedResult === result.id && styles.selectedOption,
-                      { borderColor: theme.text },
-                    ]}
-                    onPress={() => setSelectedResult(result.id)}
-                  >
-                    <ThemedText>{result.label}</ThemedText>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-          )}
+          {/* Subtitle */}
+          <ThemedText style={styles.subtitle}>
+            {showResults ? "What was the result?" : "Pick the test you used"}
+          </ThemedText>
 
-          {/* Buttons */}
-          <SmallTextButton onPress={handleCancel}>
-            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
-          </SmallTextButton>
-          <DefaultButton
-            onPress={handleSave}
-            defaultColor={theme.yellow}
-            defaultTextColor={theme.white}
-          >
-            Save
-          </DefaultButton>
+          {/* Test Options or Results */}
+          <View style={styles.testOptionsContainer}>
+            {!showResults ? (
+              // Show test type options
+              <>
+                <Pressable
+                  style={[
+                    styles.testOption,
+                    selectedTestType === "strip_test" && [
+                      styles.selectedOption,
+                      { backgroundColor: theme.blue + "20" },
+                    ],
+                  ]}
+                  onPress={() => setSelectedTestType("strip_test")}
+                >
+                  <View
+                    style={[
+                      styles.iconContainer,
+                      { backgroundColor: theme.background },
+                    ]}
+                  >
+                    <StripTestIcon width={40} height={40} color={theme.blue} />
+                  </View>
+                  <ThemedText style={styles.optionLabel}>Strip</ThemedText>
+                </Pressable>
+
+                <Pressable
+                  style={[
+                    styles.testOption,
+                    selectedTestType === "digital_test" && [
+                      styles.selectedOption,
+                      { backgroundColor: theme.blue + "20" },
+                    ],
+                  ]}
+                  onPress={() => setSelectedTestType("digital_test")}
+                >
+                  <View
+                    style={[
+                      styles.iconContainer,
+                      { backgroundColor: theme.background },
+                    ]}
+                  >
+                    <DigitalTestIcon
+                      width={40}
+                      height={40}
+                      color={theme.blue}
+                    />
+                  </View>
+                  <ThemedText style={styles.optionLabel}>Digital</ThemedText>
+                </Pressable>
+              </>
+            ) : (
+              // Show result options
+              <>
+                <Pressable
+                  style={[
+                    styles.testOption,
+                    selectedResult === "positive" && [
+                      styles.selectedOption,
+                      { backgroundColor: theme.blue + "20" },
+                    ],
+                  ]}
+                  onPress={() => setSelectedResult("positive")}
+                >
+                  <View
+                    style={[
+                      styles.iconContainer,
+                      { backgroundColor: theme.background },
+                    ]}
+                  >
+                    <Ionicons name="add" size={40} color={theme.blue} />
+                  </View>
+                  <ThemedText style={styles.optionLabel}>Positive</ThemedText>
+                </Pressable>
+
+                <Pressable
+                  style={[
+                    styles.testOption,
+                    selectedResult === "negative" && [
+                      styles.selectedOption,
+                      { backgroundColor: theme.blue + "20" },
+                    ],
+                  ]}
+                  onPress={() => setSelectedResult("negative")}
+                >
+                  <View
+                    style={[
+                      styles.iconContainer,
+                      { backgroundColor: theme.background },
+                    ]}
+                  >
+                    <Ionicons name="remove" size={40} color={theme.blue} />
+                  </View>
+                  <ThemedText style={styles.optionLabel}>Negative</ThemedText>
+                </Pressable>
+              </>
+            )}
+          </View>
+
+          {/* Next/Save Button */}
+          {(selectedTestType || selectedResult) && (
+            <DefaultButton
+              onPress={handleNext}
+              defaultColor={theme.red}
+              defaultTextColor={theme.white}
+              style={styles.nextButton}
+            >
+              {showResults ? "Save" : "Next"}
+            </DefaultButton>
+          )}
         </View>
       </View>
     </Modal>
@@ -134,50 +204,66 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContent: {
-    width: "90%",
-    maxHeight: "80%",
-    borderRadius: 20,
+    width: "100%",
+    height: "45%",
+    position: "absolute",
+    bottom: 0,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     padding: 20,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 15,
   },
   title: {
-    marginBottom: 20,
     textAlign: "center",
-  },
-  section: {
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  optionsContainer: {
-    gap: 10,
-  },
-  option: {
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    alignItems: "center",
-  },
-  selectedOption: {
-    opacity: 0.8,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 20,
+    fontSize: 20,
   },
   cancelText: {
     fontSize: 16,
-    opacity: 0.7,
+    fontWeight: "500",
+  },
+  placeholder: {
+    width: 50,
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 10,
+    fontWeight: "500",
+  },
+  testOptionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginBottom: 40,
+  },
+  testOption: {
+    alignItems: "center",
+    padding: 20,
+    borderRadius: 20,
+  },
+  selectedOption: {
+    borderRadius: 20,
+  },
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  optionLabel: {
+    fontSize: 16,
+  },
+  nextButton: {
+    position: "absolute",
+    bottom: 40,
+    left: 20,
+    right: 20,
   },
 });

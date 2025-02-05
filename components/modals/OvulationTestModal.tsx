@@ -5,6 +5,8 @@ import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { LOGGING_CATEGORIES } from "@/constants/LoggingOptions";
 import { TestType } from "@/types/logging";
+import { SmallTextButton } from "../buttons/SmallTextButton";
+import { DefaultButton } from "../buttons/DefaultButton";
 
 interface OvulationTestModalProps {
   isVisible: boolean;
@@ -39,6 +41,12 @@ export const OvulationTestModal: React.FC<OvulationTestModalProps> = ({
       setSelectedTestType(null);
       setSelectedResult(null);
     }
+  };
+
+  const handleCancel = () => {
+    onClose();
+    setSelectedTestType(null);
+    setSelectedResult(null);
   };
 
   if (!isVisible) return null;
@@ -102,29 +110,16 @@ export const OvulationTestModal: React.FC<OvulationTestModalProps> = ({
           )}
 
           {/* Buttons */}
-          <View style={styles.buttonContainer}>
-            <Pressable
-              style={[styles.button, { backgroundColor: theme.red }]}
-              onPress={() => {
-                onClose();
-                setSelectedTestType(null);
-                setSelectedResult(null);
-              }}
-            >
-              <ThemedText style={styles.buttonText}>Cancel</ThemedText>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.button,
-                { backgroundColor: theme.blue },
-                (!selectedTestType || !selectedResult) && styles.disabledButton,
-              ]}
-              onPress={handleSave}
-              disabled={!selectedTestType || !selectedResult}
-            >
-              <ThemedText style={styles.buttonText}>Save</ThemedText>
-            </Pressable>
-          </View>
+          <SmallTextButton onPress={handleCancel}>
+            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+          </SmallTextButton>
+          <DefaultButton
+            onPress={handleSave}
+            defaultColor={theme.yellow}
+            defaultTextColor={theme.white}
+          >
+            Save
+          </DefaultButton>
         </View>
       </View>
     </Modal>
@@ -177,20 +172,12 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    gap: 10,
-    marginTop: "auto",
-  },
-  button: {
-    flex: 1,
-    borderRadius: 10,
-    padding: 15,
+    justifyContent: "space-between",
     alignItems: "center",
+    marginTop: 20,
   },
-  disabledButton: {
-    opacity: 0.5,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
+  cancelText: {
+    fontSize: 16,
+    opacity: 0.7,
   },
 });

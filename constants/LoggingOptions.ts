@@ -12,7 +12,27 @@ export const LOGGING_CATEGORIES: LoggingCategory[] = [
         label: "Log ovulation test",
         icon: "add-circle-outline",
         backgroundColor: "#E0F4F4",
-        hasAddButton: true,
+        modalConfig: {
+          type: "ovulationTest",
+          options: {
+            strip_test: {
+              id: "strip_test",
+              label: "Strip Test",
+              results: [
+                { id: "strip_negative", label: "Negative" },
+                { id: "strip_positive", label: "Positive" },
+              ],
+            },
+            digital_test: {
+              id: "digital_test",
+              label: "Digital Test",
+              results: [
+                { id: "digital_negative", label: "Negative" },
+                { id: "digital_positive", label: "Positive" },
+              ],
+            },
+          },
+        },
       },
       {
         id: "no_test",

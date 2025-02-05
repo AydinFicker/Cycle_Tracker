@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import BottomSheet, {
   BottomSheetScrollView,
@@ -20,10 +21,22 @@ import { useNavigation } from "expo-router";
 import { AnimatedApplyButton } from "./buttons/AnimatedApplyButton";
 import { format, isToday, isYesterday, isFuture } from "date-fns";
 import { CYCLE_DATA } from "@/constants/CycleData";
+import { OvulationTestModal } from "@/components/modals/OvulationTestModal";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
   onClose: () => void;
+}
+
+interface SelectedOptions {
+  [key: string]: {
+    selected: string[];
+    details?: {
+      testTypeId?: string;
+      resultId?: string;
+      [key: string]: any;
+    };
+  };
 }
 
 export const LoggingSheet: React.FC<LoggingSheetProps> = ({
@@ -34,11 +47,11 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedOptions, setSelectedOptions] = useState<{
-    [key: string]: string[];
-  }>({});
+  const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({});
   const [searchQuery, setSearchQuery] = useState("");
   const insets = useSafeAreaInsets();
+  const [isOvulationTestModalVisible, setIsOvulationTestModalVisible] =
+    useState(false);
 
   // Format the selected date for display
   const formattedDate = useMemo(() => {
@@ -83,48 +96,82 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
 
   const handleOptionPress = useCallback(
     (categoryId: string, optionId: string) => {
-      setSelectedOptions((prev) => {
-        const currentSelected = prev[categoryId] || [];
-        const isAlreadySelected = currentSelected.includes(optionId);
+      // Find the selected option
+      const category = LOGGING_CATEGORIES.find((cat) => cat.id === categoryId);
+      const option = category?.options.find((opt) => opt.id === optionId);
 
-        if (isAlreadySelected) {
-          // Remove the option if it's already selected
-          const newSelected = currentSelected.filter((id) => id !== optionId);
-          const newState = { ...prev };
-          if (newSelected.length === 0) {
-            delete newState[categoryId];
+      if (option?.modalConfig?.type === "ovulationTest") {
+        setIsOvulationTestModalVisible(true);
+      } else {
+        // Handle normal selection
+        setSelectedOptions((prev) => {
+          const currentSelected = prev[categoryId]?.selected || [];
+          const isAlreadySelected = currentSelected.includes(optionId);
+
+          if (isAlreadySelected) {
+            const newSelected = currentSelected.filter((id) => id !== optionId);
+            const newState = { ...prev };
+            if (newSelected.length === 0) {
+              delete newState[categoryId];
+            } else {
+              newState[categoryId] = { selected: newSelected };
+            }
+            return newState;
           } else {
-            newState[categoryId] = newSelected;
+            return {
+              ...prev,
+              [categoryId]: {
+                selected: [...currentSelected, optionId],
+              },
+            };
           }
-          return newState;
-        } else {
-          // Add the option if it's not selected
-          return {
-            ...prev,
-            [categoryId]: [...currentSelected, optionId],
-          };
-        }
-      });
+        });
+      }
     },
     []
   );
 
-  const handleApply = useCallback(
-    (categoryId: string) => {
-      // Handle applying the selected options
-      console.log(
-        "Applying options for category:",
-        categoryId,
-        selectedOptions[categoryId]
-      );
-      // Clear selections for this category after applying
+  const handleModalSubmit = useCallback(
+    (data: { testTypeId: string; resultId: string }) => {
+      // Store the detailed data for future analysis
+      console.log("Modal data submitted:", data);
+
+      // Mark the "Log ovulation test" option as selected and store the detailed data
       setSelectedOptions((prev) => ({
         ...prev,
-        [categoryId]: [],
+        ovulation_test: {
+          selected: ["log_test"],
+          details: {
+            testTypeId: data.testTypeId,
+            resultId: data.resultId,
+          },
+        },
       }));
+
+      // Close the modal
+      setIsOvulationTestModalVisible(false);
     },
-    [selectedOptions]
+    []
   );
+
+  const handleApply = useCallback(() => {
+    // Prepare data for API call
+    const apiData = Object.entries(selectedOptions).map(
+      ([categoryId, data]) => ({
+        categoryId,
+        selected: data.selected,
+        details: data.details,
+        // timestamp: selectedDate,
+      })
+    );
+
+    // Log the data that would be sent to the API
+    console.log("Sending to API:", apiData);
+
+    // Clear selections after successful API call
+    setSelectedOptions({});
+    onClose();
+  }, [selectedOptions, selectedDate, onClose]);
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -151,128 +198,137 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const hasSelections = Object.keys(selectedOptions).length > 0;
 
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={-1}
-      snapPoints={snapPoints}
-      onChange={handleSheetChange}
-      onAnimate={handleSheetAnimate}
-      enablePanDownToClose
-      backdropComponent={renderBackdrop}
-      backgroundStyle={{ backgroundColor: theme.modalBackground }}
-      handleIndicatorStyle={{ backgroundColor: theme.text }}
-      topInset={insets.top}
-      style={styles.bottomSheet}
-    >
-      <View style={{ flex: 1 }}>
-        {/* Sticky Header */}
-        <View
-          style={[styles.header, { backgroundColor: theme.modalBackground }]}
-        >
-          <View style={styles.headerTop}>
-            <View style={styles.dateNavigator}>
-              <TouchableOpacity
-                onPress={() => {
-                  const newDate = new Date(selectedDate);
-                  newDate.setDate(newDate.getDate() - 1);
-                  setSelectedDate(newDate);
-                  setSelectedOptions({});
-                }}
-                style={[styles.dateArrow, styles.leftArrow]}
-              >
-                <Ionicons name="chevron-back" size={24} color={theme.text} />
-              </TouchableOpacity>
-              <ThemedText type="subtitle">{formattedDate}</ThemedText>
-              <TouchableOpacity
-                onPress={() => {
-                  const newDate = new Date(selectedDate);
-                  newDate.setDate(newDate.getDate() + 1);
-                  if (!isFuture(newDate)) {
+    <>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChange}
+        onAnimate={handleSheetAnimate}
+        enablePanDownToClose
+        backdropComponent={renderBackdrop}
+        backgroundStyle={{ backgroundColor: theme.modalBackground }}
+        handleIndicatorStyle={{ backgroundColor: theme.text }}
+        topInset={insets.top}
+        style={styles.bottomSheet}
+      >
+        <View style={{ flex: 1 }}>
+          {/* Sticky Header */}
+          <View
+            style={[styles.header, { backgroundColor: theme.modalBackground }]}
+          >
+            <View style={styles.headerTop}>
+              <View style={styles.dateNavigator}>
+                <TouchableOpacity
+                  onPress={() => {
+                    const newDate = new Date(selectedDate);
+                    newDate.setDate(newDate.getDate() - 1);
                     setSelectedDate(newDate);
                     setSelectedOptions({});
-                  }
-                }}
-                style={[
-                  styles.dateArrow,
-                  styles.rightArrow,
-                  isFuture(
-                    new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000)
-                  ) && styles.dateArrowDisabled,
-                ]}
-              >
-                <Ionicons name="chevron-forward" size={24} color={theme.text} />
-              </TouchableOpacity>
-            </View>
-            <ThemedText style={styles.cycleDay}>
-              Cycle day {cycleDay}
-            </ThemedText>
-          </View>
-
-          <View
-            style={[
-              styles.searchContainer,
-              { backgroundColor: theme.background },
-            ]}
-          >
-            <Ionicons
-              name="search"
-              size={20}
-              color={theme.text}
-              style={styles.searchIcon}
-            />
-            <TextInput
-              placeholder="Search"
-              placeholderTextColor={theme.tabIconDefault}
-              style={[styles.searchInput, { color: theme.text }]}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-
-          <View style={styles.dataProtection}>
-            <Ionicons name="shield-checkmark" size={20} color={theme.blue} />
-            <ThemedText style={styles.protectionText}>
-              Your data is protected
-            </ThemedText>
-          </View>
-        </View>
-
-        {/* Scrollable Content */}
-        <BottomSheetScrollView
-          contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.categoriesContainer}>
-            <View style={styles.categoryHeader}>
-              <ThemedText type="title" style={styles.categoryTitle}>
-                Categories
+                  }}
+                  style={[styles.dateArrow, styles.leftArrow]}
+                >
+                  <Ionicons name="chevron-back" size={24} color={theme.text} />
+                </TouchableOpacity>
+                <ThemedText type="subtitle">{formattedDate}</ThemedText>
+                <TouchableOpacity
+                  onPress={() => {
+                    const newDate = new Date(selectedDate);
+                    newDate.setDate(newDate.getDate() + 1);
+                    if (!isFuture(newDate)) {
+                      setSelectedDate(newDate);
+                      setSelectedOptions({});
+                    }
+                  }}
+                  style={[
+                    styles.dateArrow,
+                    styles.rightArrow,
+                    isFuture(
+                      new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000)
+                    ) && styles.dateArrowDisabled,
+                  ]}
+                >
+                  <Ionicons
+                    name="chevron-forward"
+                    size={24}
+                    color={theme.text}
+                  />
+                </TouchableOpacity>
+              </View>
+              <ThemedText style={styles.cycleDay}>
+                Cycle day {cycleDay}
               </ThemedText>
-              <ThemedText style={styles.editButton}>Edit</ThemedText>
             </View>
 
-            {filteredCategories.map((category) => (
-              <LoggingCategory
-                key={category.id}
-                category={category}
-                selectedOptions={selectedOptions[category.id] || []}
-                onOptionPress={(optionId) =>
-                  handleOptionPress(category.id, optionId)
-                }
+            <View
+              style={[
+                styles.searchContainer,
+                { backgroundColor: theme.background },
+              ]}
+            >
+              <Ionicons
+                name="search"
+                size={20}
+                color={theme.text}
+                style={styles.searchIcon}
               />
-            ))}
-          </View>
-        </BottomSheetScrollView>
+              <TextInput
+                placeholder="Search"
+                placeholderTextColor={theme.tabIconDefault}
+                style={[styles.searchInput, { color: theme.text }]}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
 
-        <AnimatedApplyButton
-          isVisible={hasSelections}
-          onPress={() => {
-            console.log("Applying all selections:", selectedOptions);
-            setSelectedOptions({});
-          }}
-          onClose={onClose}
-        />
-      </View>
-    </BottomSheet>
+            <View style={styles.dataProtection}>
+              <Ionicons name="shield-checkmark" size={20} color={theme.blue} />
+              <ThemedText style={styles.protectionText}>
+                Your data is protected
+              </ThemedText>
+            </View>
+          </View>
+
+          {/* Scrollable Content */}
+          <BottomSheetScrollView
+            contentContainerStyle={styles.contentContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.categoriesContainer}>
+              <View style={styles.categoryHeader}>
+                <ThemedText type="title" style={styles.categoryTitle}>
+                  Categories
+                </ThemedText>
+                <ThemedText style={styles.editButton}>Edit</ThemedText>
+              </View>
+
+              {filteredCategories.map((category) => (
+                <LoggingCategory
+                  key={category.id}
+                  category={category}
+                  selectedOptions={selectedOptions[category.id]?.selected || []}
+                  onOptionPress={(optionId) =>
+                    handleOptionPress(category.id, optionId)
+                  }
+                />
+              ))}
+            </View>
+          </BottomSheetScrollView>
+
+          <AnimatedApplyButton
+            isVisible={hasSelections}
+            onPress={handleApply}
+            onClose={onClose}
+          />
+        </View>
+      </BottomSheet>
+
+      <OvulationTestModal
+        isVisible={isOvulationTestModalVisible}
+        onClose={() => setIsOvulationTestModalVisible(false)}
+        onSubmit={handleModalSubmit}
+      />
+    </>
   );
 };
 

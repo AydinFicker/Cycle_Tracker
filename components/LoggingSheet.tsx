@@ -22,6 +22,8 @@ import { AnimatedApplyButton } from "./buttons/AnimatedApplyButton";
 import { format, isToday, isYesterday, isFuture } from "date-fns";
 import { CYCLE_DATA } from "@/constants/CycleData";
 import { OvulationTestModal } from "@/components/modals/OvulationTestModal";
+import { WaterSection } from "./logging/WaterSection";
+import { DefaultButton } from "./buttons/DefaultButton";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -34,6 +36,7 @@ interface SelectedOptions {
     details?: {
       testTypeId?: string;
       resultId?: string;
+      waterAmount?: number;
       [key: string]: any;
     };
   };
@@ -52,6 +55,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const insets = useSafeAreaInsets();
   const [isOvulationTestModalVisible, setIsOvulationTestModalVisible] =
     useState(false);
+  const [waterAmount, setWaterAmount] = useState(0);
 
   // Format the selected date for display
   const formattedDate = useMemo(() => {
@@ -131,6 +135,19 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
     []
   );
 
+  const handleWaterChange = useCallback((amount: number) => {
+    setWaterAmount(amount);
+    setSelectedOptions((prev) => ({
+      ...prev,
+      water_tracking: {
+        selected: ["log_water"],
+        details: {
+          waterAmount: amount,
+        },
+      },
+    }));
+  }, []);
+
   const handleModalSubmit = useCallback(
     (data: { testTypeId: string; resultId: string }) => {
       // Store the detailed data for future analysis
@@ -185,14 +202,19 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   );
 
   const filteredCategories = useMemo(() => {
-    if (!searchQuery) return LOGGING_CATEGORIES;
+    if (!searchQuery) {
+      // Filter out water tracking from categories since we're showing it separately
+      return LOGGING_CATEGORIES.filter((cat) => cat.id !== "water_tracking");
+    }
 
-    return LOGGING_CATEGORIES.map((category) => ({
-      ...category,
-      options: category.options.filter((option) =>
-        option.label.toLowerCase().includes(searchQuery.toLowerCase())
-      ),
-    })).filter((category) => category.options.length > 0);
+    return LOGGING_CATEGORIES.filter((cat) => cat.id !== "water_tracking")
+      .map((category) => ({
+        ...category,
+        options: category.options.filter((option) =>
+          option.label.toLowerCase().includes(searchQuery.toLowerCase())
+        ),
+      }))
+      .filter((category) => category.options.length > 0);
   }, [searchQuery]);
 
   const hasSelections = Object.keys(selectedOptions).length > 0;
@@ -312,6 +334,14 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
                   }
                 />
               ))}
+              <WaterSection
+                waterAmount={waterAmount}
+                onIncrement={() => handleWaterChange(waterAmount + 8)}
+                onDecrement={() =>
+                  handleWaterChange(Math.max(0, waterAmount - 8))
+                }
+                settingsHref="/(tabs)/Home"
+              />
             </View>
           </BottomSheetScrollView>
 
@@ -418,5 +448,18 @@ const styles = StyleSheet.create({
   },
   dateArrowDisabled: {
     opacity: 0.3,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  submitButton: {
+    marginTop: 20,
   },
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -9,13 +9,18 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { WaterSettingsModal } from "../modals/WaterSettingsModal";
 
 interface WaterSectionProps {
   waterAmount: number;
   onIncrement: () => void;
   onDecrement: () => void;
   dailyGoal?: number;
-  settingsHref?: string;
+  increment?: number;
+  onSettingsChange?: (settings: {
+    dailyGoal: number;
+    increment: number;
+  }) => void;
 }
 
 export const WaterSection: React.FC<WaterSectionProps> = ({
@@ -23,10 +28,23 @@ export const WaterSection: React.FC<WaterSectionProps> = ({
   onIncrement,
   onDecrement,
   dailyGoal = 72,
-  settingsHref = "/home",
+  increment = 8,
+  onSettingsChange,
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
+  const [isSettingsModalVisible, setIsSettingsModalVisible] = useState(false);
+
+  const handleSettingsPress = () => {
+    setIsSettingsModalVisible(true);
+  };
+
+  const handleSettingsSubmit = (settings: {
+    dailyGoal: number;
+    increment: number;
+  }) => {
+    onSettingsChange?.(settings);
+  };
 
   return (
     <View style={styles.container}>
@@ -38,10 +56,14 @@ export const WaterSection: React.FC<WaterSectionProps> = ({
             <Ionicons name="water" size={24} color={theme.blue} />
             <ThemedText style={styles.waterTitle}>Water</ThemedText>
           </View>
-          <ThemedText style={styles.waterGoal}>
-            {waterAmount} / {dailyGoal} fl. oz.
-          </ThemedText>
+          <TouchableOpacity onPress={handleSettingsPress}>
+            <Ionicons name="settings-outline" size={24} color={theme.text} />
+          </TouchableOpacity>
         </View>
+
+        <ThemedText style={styles.waterGoal}>
+          {waterAmount} / {dailyGoal} fl. oz.
+        </ThemedText>
 
         <View style={styles.waterControls}>
           <TouchableOpacity
@@ -57,6 +79,7 @@ export const WaterSection: React.FC<WaterSectionProps> = ({
 
           <View style={styles.waterAmountContainer}>
             <ThemedText style={styles.waterAmount}>{waterAmount}</ThemedText>
+            <ThemedText style={styles.waterUnit}>fl. oz.</ThemedText>
           </View>
 
           <TouchableOpacity
@@ -71,24 +94,20 @@ export const WaterSection: React.FC<WaterSectionProps> = ({
         </View>
       </View>
 
-      <TouchableOpacity
-        onPress={() => router.push(settingsHref as any)}
-        style={[styles.remindersSection, { backgroundColor: theme.background }]}
-      >
-        <View style={styles.remindersTitleContainer}>
-          <ThemedText style={styles.remindersTitle}>
-            Reminders and Settings
-          </ThemedText>
-        </View>
-        <Ionicons name="chevron-forward" size={24} color={theme.text} />
-      </TouchableOpacity>
+      <WaterSettingsModal
+        isVisible={isSettingsModalVisible}
+        onClose={() => setIsSettingsModalVisible(false)}
+        onSubmit={handleSettingsSubmit}
+        currentDailyGoal={dailyGoal}
+        currentIncrement={increment}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    gap: 16,
+    gap: 4,
   },
   waterSection: {
     borderRadius: 16,
@@ -98,7 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 8,
   },
   waterTitleContainer: {
     flexDirection: "row",
@@ -111,6 +130,7 @@ const styles = StyleSheet.create({
   },
   waterGoal: {
     opacity: 0.7,
+    marginBottom: 16,
   },
   waterControls: {
     flexDirection: "row",
@@ -131,19 +151,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
   },
-  remindersSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderRadius: 16,
-    padding: 16,
-  },
-  remindersTitleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  remindersTitle: {
-    fontSize: 16,
-    fontWeight: "500",
+  waterUnit: {
+    fontSize: 12,
+    opacity: 0.7,
   },
 });

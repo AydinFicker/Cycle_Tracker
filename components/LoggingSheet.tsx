@@ -56,6 +56,10 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const [isOvulationTestModalVisible, setIsOvulationTestModalVisible] =
     useState(false);
   const [waterAmount, setWaterAmount] = useState(0);
+  const [waterSettings, setWaterSettings] = useState({
+    dailyGoal: 72,
+    increment: 8,
+  });
 
   // Format the selected date for display
   const formattedDate = useMemo(() => {
@@ -147,6 +151,13 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
       },
     }));
   }, []);
+
+  const handleWaterSettingsChange = useCallback(
+    (settings: { dailyGoal: number; increment: number }) => {
+      setWaterSettings(settings);
+    },
+    []
+  );
 
   const handleModalSubmit = useCallback(
     (data: { testTypeId: string; resultId: string }) => {
@@ -336,11 +347,17 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
               ))}
               <WaterSection
                 waterAmount={waterAmount}
-                onIncrement={() => handleWaterChange(waterAmount + 8)}
-                onDecrement={() =>
-                  handleWaterChange(Math.max(0, waterAmount - 8))
+                onIncrement={() =>
+                  handleWaterChange(waterAmount + waterSettings.increment)
                 }
-                settingsHref="/(tabs)/Home"
+                onDecrement={() =>
+                  handleWaterChange(
+                    Math.max(0, waterAmount - waterSettings.increment)
+                  )
+                }
+                dailyGoal={waterSettings.dailyGoal}
+                increment={waterSettings.increment}
+                onSettingsChange={handleWaterSettingsChange}
               />
             </View>
           </BottomSheetScrollView>

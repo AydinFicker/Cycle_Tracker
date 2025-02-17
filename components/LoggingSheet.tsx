@@ -23,6 +23,7 @@ import { format, isToday, isYesterday, isFuture } from "date-fns";
 import { CYCLE_DATA } from "@/constants/CycleData";
 import { OvulationTestModal } from "@/components/modals/OvulationTestModal";
 import { WaterSection } from "./logging/WaterSection";
+import { WeightSection } from "./logging/WeightSection";
 import { DefaultButton } from "./buttons/DefaultButton";
 
 interface LoggingSheetProps {
@@ -37,6 +38,8 @@ interface SelectedOptions {
       testTypeId?: string;
       resultId?: string;
       waterAmount?: number;
+      weight?: number;
+      unit?: "lbs" | "kg";
       [key: string]: any;
     };
   };
@@ -60,6 +63,8 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
     dailyGoal: 72,
     increment: 8,
   });
+  const [weight, setWeight] = useState<number | null>(null);
+  const [weightUnit, setWeightUnit] = useState<"lbs" | "kg">("lbs");
 
   // Format the selected date for display
   const formattedDate = useMemo(() => {
@@ -155,6 +160,29 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const handleWaterSettingsChange = useCallback(
     (settings: { dailyGoal: number; increment: number }) => {
       setWaterSettings(settings);
+    },
+    []
+  );
+
+  const handleWeightChange = useCallback(
+    (newWeight: number | null, newUnit: "lbs" | "kg") => {
+      setWeight(newWeight);
+      setWeightUnit(newUnit);
+      setSelectedOptions((prev) => {
+        const newState = { ...prev };
+        if (newWeight === null) {
+          delete newState.weight_tracking;
+        } else {
+          newState.weight_tracking = {
+            selected: ["log_weight"],
+            details: {
+              weight: newWeight,
+              unit: newUnit,
+            },
+          };
+        }
+        return newState;
+      });
     },
     []
   );
@@ -345,6 +373,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
                   }
                 />
               ))}
+
               <WaterSection
                 waterAmount={waterAmount}
                 onIncrement={() =>
@@ -358,6 +387,12 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
                 dailyGoal={waterSettings.dailyGoal}
                 increment={waterSettings.increment}
                 onSettingsChange={handleWaterSettingsChange}
+              />
+
+              <WeightSection
+                weight={weight}
+                unit={weightUnit}
+                onWeightChange={handleWeightChange}
               />
             </View>
           </BottomSheetScrollView>

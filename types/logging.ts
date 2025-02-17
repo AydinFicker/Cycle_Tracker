@@ -10,7 +10,7 @@ export interface TestType {
 }
 
 export interface ModalConfig {
-  type: "ovulationTest" | "water" | "pill";
+  type: "ovulationTest" | "water" | "pill" | "weight";
   options?: {
     [key: string]: TestType;
   };

@@ -38,52 +38,72 @@ export const WeightSection: React.FC<WeightSectionProps> = ({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.weightSection, { backgroundColor: theme.background }]}
-        onPress={handlePress}
+      <View
+        style={[styles.contentContainer, { backgroundColor: theme.background }]}
       >
-        <View style={styles.weightHeader}>
-          <View style={styles.weightTitleContainer}>
-            <Ionicons name="scale" size={24} color={theme.red} />
-            <ThemedText style={styles.weightTitle}>Weight</ThemedText>
+        <TouchableOpacity
+          style={[styles.weightSection, { backgroundColor: theme.background }]}
+          onPress={handlePress}
+        >
+          <View style={styles.weightHeader}>
+            <View style={styles.weightTitleContainer}>
+              <Ionicons name="scale" size={24} color={theme.red} />
+              <ThemedText style={styles.weightTitle}>Weight</ThemedText>
+            </View>
+            {weight !== null && (
+              <TouchableOpacity
+                onPress={() => onWeightChange(null, unit)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name="trash-outline" size={24} color={theme.text} />
+              </TouchableOpacity>
+            )}
           </View>
-          {weight !== null && (
-            <TouchableOpacity
-              onPress={() => onWeightChange(null, unit)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="trash-outline" size={24} color={theme.text} />
-            </TouchableOpacity>
+
+          {weight && (
+            <View style={styles.weightAmountContainer}>
+              <ThemedText style={styles.weightAmount}>
+                {weight.toFixed(1)}
+              </ThemedText>
+              <ThemedText style={styles.weightUnit}>{unit}</ThemedText>
+            </View>
           )}
-        </View>
 
-        {weight && (
-          <ThemedText style={styles.weightValue}>
-            {weight.toFixed(1)} {unit}
-          </ThemedText>
-        )}
+          {!weight && (
+            <ThemedText style={styles.innerText}>Log your weight</ThemedText>
+          )}
+        </TouchableOpacity>
 
-        {!weight && <ThemedText>Log your weight</ThemedText>}
-      </TouchableOpacity>
-
-      <WeightSettingsModal
-        isVisible={isSettingsModalVisible}
-        onClose={() => setIsSettingsModalVisible(false)}
-        onSubmit={handleWeightSubmit}
-        currentWeight={weight}
-        currentUnit={unit}
-      />
+        <WeightSettingsModal
+          isVisible={isSettingsModalVisible}
+          onClose={() => setIsSettingsModalVisible(false)}
+          onSubmit={handleWeightSubmit}
+          currentWeight={weight}
+          currentUnit={unit}
+        />
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 8,
+    marginBottom: 16,
+  },
+  contentContainer: {
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   weightSection: {
     borderRadius: 16,
-    padding: 16,
   },
   weightHeader: {
     flexDirection: "row",
@@ -103,5 +123,25 @@ const styles = StyleSheet.create({
   weightValue: {
     opacity: 0.7,
     fontSize: 20,
+  },
+  innerText: {
+    opacity: 0.7,
+    fontSize: 18,
+    marginTop: 4,
+  },
+  weightAmountContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingTop: 12,
+  },
+  weightAmount: {
+    fontSize: 32,
+    fontWeight: "600",
+    lineHeight: 32,
+  },
+  weightUnit: {
+    fontSize: 16,
+    opacity: 0.7,
   },
 });

@@ -49,49 +49,53 @@ export const WaterSection: React.FC<WaterSectionProps> = ({
   return (
     <View style={styles.container}>
       <View
-        style={[styles.waterSection, { backgroundColor: theme.background }]}
+        style={[styles.contentContainer, { backgroundColor: theme.background }]}
       >
-        <View style={styles.waterHeader}>
-          <View style={styles.waterTitleContainer}>
-            <Ionicons name="water" size={24} color={theme.blue} />
-            <ThemedText style={styles.waterTitle}>Water</ThemedText>
-          </View>
-          <TouchableOpacity onPress={handleSettingsPress}>
-            <Ionicons name="settings-outline" size={24} color={theme.text} />
-          </TouchableOpacity>
-        </View>
-
-        <ThemedText style={styles.waterGoal}>
-          {waterAmount} / {dailyGoal} fl. oz.
-        </ThemedText>
-
-        <View style={styles.waterControls}>
-          <View style={styles.waterAmountContainer}>
-            <ThemedText style={styles.waterAmount}>{waterAmount}</ThemedText>
-            <ThemedText style={styles.waterUnit}>fl. oz.</ThemedText>
+        <View
+          style={[styles.waterSection, { backgroundColor: theme.background }]}
+        >
+          <View style={styles.waterHeader}>
+            <View style={styles.waterTitleContainer}>
+              <Ionicons name="water" size={24} color={theme.blue} />
+              <ThemedText style={styles.waterTitle}>Water</ThemedText>
+            </View>
+            <TouchableOpacity onPress={handleSettingsPress}>
+              <Ionicons name="settings-outline" size={24} color={theme.text} />
+            </TouchableOpacity>
           </View>
 
-          <View style={styles.waterControlsInner}>
-            <TouchableOpacity
-              onPress={onDecrement}
-              style={[
-                styles.waterButton,
-                { backgroundColor: theme.buttonBackground },
-              ]}
-              disabled={waterAmount <= 0}
-            >
-              <Ionicons name="remove" size={24} color={theme.text} />
-            </TouchableOpacity>
+          <ThemedText style={styles.waterGoal}>
+            {waterAmount} / {dailyGoal} fl. oz.
+          </ThemedText>
 
-            <TouchableOpacity
-              onPress={onIncrement}
-              style={[
-                styles.waterButton,
-                { backgroundColor: theme.buttonBackground },
-              ]}
-            >
-              <Ionicons name="add" size={24} color={theme.text} />
-            </TouchableOpacity>
+          <View style={styles.waterControls}>
+            <View style={styles.waterAmountContainer}>
+              <ThemedText style={styles.waterAmount}>{waterAmount}</ThemedText>
+              <ThemedText style={styles.waterUnit}>fl. oz.</ThemedText>
+            </View>
+
+            <View style={styles.waterControlsInner}>
+              <TouchableOpacity
+                onPress={onDecrement}
+                style={[
+                  styles.waterButton,
+                  { backgroundColor: theme.buttonBackground },
+                ]}
+                disabled={waterAmount <= 0}
+              >
+                <Ionicons name="remove" size={24} color={theme.text} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={onIncrement}
+                style={[
+                  styles.waterButton,
+                  { backgroundColor: theme.buttonBackground },
+                ]}
+              >
+                <Ionicons name="add" size={24} color={theme.text} />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -109,11 +113,22 @@ export const WaterSection: React.FC<WaterSectionProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    gap: 4,
+    marginBottom: 16,
+  },
+  contentContainer: {
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   waterSection: {
     borderRadius: 16,
-    padding: 16,
   },
   waterHeader: {
     flexDirection: "row",
@@ -163,8 +178,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
   waterUnit: {
-    fontSize: 12,
+    fontSize: 16,
     opacity: 0.7,
-    marginTop: 6,
   },
 });

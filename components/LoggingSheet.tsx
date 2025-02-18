@@ -27,6 +27,7 @@ import { WaterSection } from "./logging/WaterSection";
 import { WeightSection } from "./logging/WeightSection";
 import { DefaultButton } from "./buttons/DefaultButton";
 import { LoggingData } from "@/types/logging";
+import { PillSection, Pill } from "./logging/PillSection";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -46,6 +47,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const insets = useSafeAreaInsets();
   const [isOvulationTestModalVisible, setIsOvulationTestModalVisible] =
     useState(false);
+  const [pills, setPills] = useState<Pill[]>([]);
 
   // Format the selected date for display
   const formattedDate = useMemo(() => {
@@ -155,7 +157,16 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   );
 
   const handleApply = () => {
-    console.log("Submitting logging data:", loggingData);
+    // Deep clone the data to avoid [Array] in console
+    const dataToLog = JSON.parse(JSON.stringify(loggingData));
+
+    // Log the full data structure
+    console.log("Full logging data:", JSON.stringify(dataToLog, null, 2));
+
+    if (dataToLog.pill_tracking) {
+      console.log("Taken pills:", dataToLog.pill_tracking.details.pills);
+    }
+
     // TODO: Add actual API call here
     onClose();
   };
@@ -188,6 +199,58 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   }, [searchQuery]);
 
   const hasSelectedOptions = Object.keys(loggingData).length > 0;
+
+  const handlePillAdd = (pillData: Omit<Pill, "id" | "taken">) => {
+    // Create multiple pill instances based on intakes with sequential numbers
+    const newPills = Array.from({ length: pillData.intakes }, (_, index) => ({
+      ...pillData,
+      id: `${Date.now()}-${index + 1}`,
+      intakeNumber: index + 1, // Set sequential intake numbers (1, 2, 3, etc.)
+      taken: false,
+    }));
+
+    setPills([...newPills, ...pills]);
+  };
+
+  const handlePillTake = (pillId: string) => {
+    // Update the pills state
+    setPills(
+      pills.map((pill) =>
+        pill.id === pillId ? { ...pill, taken: !pill.taken } : pill
+      )
+    );
+
+    // Update loggingData when pills are taken/untaken
+    setLoggingData((prev) => {
+      const updatedPills = pills.map((pill) =>
+        pill.id === pillId ? { ...pill, taken: !pill.taken } : pill
+      );
+      const takenPills = updatedPills.filter((pill) => pill.taken);
+
+      if (takenPills.length > 0) {
+        return {
+          ...prev,
+          pill_tracking: {
+            selected: true,
+            timestamp: new Date(),
+            details: {
+              pills: takenPills.map((pill) => ({
+                id: pill.id,
+                name: pill.name.replace(/\s+\d+$/, ""), // Remove trailing numbers
+                intakeNumber: pill.intakeNumber,
+                taken: true,
+                icon: pill.icon,
+              })),
+            },
+          },
+        };
+      } else {
+        // If no pills are taken, remove pill tracking from loggingData
+        const { pill_tracking, ...rest } = prev;
+        return rest;
+      }
+    });
+  };
 
   return (
     <>
@@ -298,6 +361,11 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
                   // Render custom components for tracking essentials
                   return (
                     <View key={category.id}>
+                      <PillSection
+                        pills={pills}
+                        onPillAdd={handlePillAdd}
+                        onPillTake={handlePillTake}
+                      />
                       <WaterSection
                         waterAmount={
                           loggingData.water_tracking?.details?.waterAmount ?? 0

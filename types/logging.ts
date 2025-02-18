@@ -9,6 +9,14 @@ export interface TestType {
   results: TestResult[];
 }
 
+export interface Pill {
+  id: string;
+  name: string;
+  intakeNumber: number;
+  taken: boolean;
+  icon: "pill" | "capsule" | "tablet" | "oval";
+}
+
 export interface ModalConfig {
   type: "ovulationTest" | "water" | "pill" | "weight";
   options?: {
@@ -46,6 +54,7 @@ export type LoggingData = {
       waterAmount?: number;
       weight?: number | null;
       unit?: "lbs" | "kg";
+      pills?: Pill[];
       testTypeId?: string;
       resultId?: string;
       [key: string]: any;

@@ -425,31 +425,23 @@ export const LOGGING_CATEGORIES: LoggingCategory[] = [
     ],
   },
   {
-    id: "other_pills",
-    title: "Other pills (non-OC)",
-    description: "Log other pills you take a day",
-    backgroundColor: "#E0F0FF", // Light blue
+    id: "tracking_essentials",
+    title: "Tracking Essentials",
+    backgroundColor: "#F5F5F5",
     options: [
       {
-        id: "add_pill",
-        label: "Add pill",
-        icon: "add-circle",
-        backgroundColor: "#E0F0FF",
-        hasAddButton: true,
+        id: "pill_tracking",
+        label: "Pills",
+        icon: "medical",
+        hasCustomComponent: true,
+        modalConfig: {
+          type: "pill",
+        },
       },
-    ],
-  },
-  {
-    id: "tracking_essentials",
-    title: "Daily Tracking",
-    backgroundColor: "#E0F4F4", // Light teal
-    isStandalone: true,
-    options: [
       {
         id: "water_tracking",
-        label: "Water Intake",
+        label: "Water",
         icon: "water",
-        backgroundColor: "#E0F4F4",
         hasCustomComponent: true,
         modalConfig: {
           type: "water",
@@ -459,7 +451,6 @@ export const LOGGING_CATEGORIES: LoggingCategory[] = [
         id: "weight_tracking",
         label: "Weight",
         icon: "scale",
-        backgroundColor: "#E6E6FA",
         hasCustomComponent: true,
         modalConfig: {
           type: "weight",

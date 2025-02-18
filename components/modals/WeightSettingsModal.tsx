@@ -11,6 +11,7 @@ import { Colors } from "@/constants/Colors";
 import { DefaultButton } from "../buttons/DefaultButton";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
+import { SmallTextButton } from "../buttons/SmallTextButton";
 
 interface WeightSettingsModalProps {
   isVisible: boolean;
@@ -91,7 +92,12 @@ export const WeightSettingsModal: React.FC<WeightSettingsModalProps> = ({
   if (!isVisible) return null;
 
   return (
-    <Modal visible={isVisible} transparent onRequestClose={onClose}>
+    <Modal
+      visible={isVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.modalOverlay}>
         <View
           style={[
@@ -101,13 +107,14 @@ export const WeightSettingsModal: React.FC<WeightSettingsModalProps> = ({
         >
           {/* Header */}
           <View style={styles.header}>
-            <View style={styles.placeholder} />
+            <SmallTextButton onPress={onClose}>
+              <ThemedText style={[styles.cancelText, { color: theme.red }]}>
+                Cancel
+              </ThemedText>
+            </SmallTextButton>
             <ThemedText type="title" style={styles.title}>
               Log your weight
             </ThemedText>
-            <TouchableOpacity onPress={handleReset} style={styles.trashButton}>
-              <Ionicons name="trash-outline" size={24} color={theme.red} />
-            </TouchableOpacity>
           </View>
 
           {/* Weight Picker */}
@@ -195,21 +202,20 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: 30,
+    position: "relative",
   },
   title: {
     textAlign: "center",
     fontSize: 20,
+    flex: 1,
   },
-  placeholder: {
-    width: 40,
-  },
-  trashButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+  cancelText: {
+    fontSize: 16,
+    fontWeight: "500",
+    position: "absolute",
+    left: 0,
+    zIndex: 1,
   },
   pickerContainer: {
     flex: 1,
@@ -226,7 +232,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   picker: {
-    width: 80,
+    width: 100,
     height: 150,
   },
   decimal: {
@@ -234,6 +240,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   saveButton: {
-    marginTop: 20,
+    marginVertical: 20,
   },
 });

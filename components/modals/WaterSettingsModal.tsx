@@ -44,7 +44,12 @@ export const WaterSettingsModal: React.FC<WaterSettingsModalProps> = ({
   if (!isVisible) return null;
 
   return (
-    <Modal visible={isVisible} transparent onRequestClose={onClose}>
+    <Modal
+      visible={isVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.modalOverlay}>
         <View
           style={[

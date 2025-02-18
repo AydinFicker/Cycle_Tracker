@@ -66,31 +66,33 @@ export const WaterSection: React.FC<WaterSectionProps> = ({
         </ThemedText>
 
         <View style={styles.waterControls}>
-          <TouchableOpacity
-            onPress={onDecrement}
-            style={[
-              styles.waterButton,
-              { backgroundColor: theme.buttonBackground },
-            ]}
-            disabled={waterAmount <= 0}
-          >
-            <Ionicons name="remove" size={24} color={theme.text} />
-          </TouchableOpacity>
-
           <View style={styles.waterAmountContainer}>
             <ThemedText style={styles.waterAmount}>{waterAmount}</ThemedText>
             <ThemedText style={styles.waterUnit}>fl. oz.</ThemedText>
           </View>
 
-          <TouchableOpacity
-            onPress={onIncrement}
-            style={[
-              styles.waterButton,
-              { backgroundColor: theme.buttonBackground },
-            ]}
-          >
-            <Ionicons name="add" size={24} color={theme.text} />
-          </TouchableOpacity>
+          <View style={styles.waterControlsInner}>
+            <TouchableOpacity
+              onPress={onDecrement}
+              style={[
+                styles.waterButton,
+                { backgroundColor: theme.buttonBackground },
+              ]}
+              disabled={waterAmount <= 0}
+            >
+              <Ionicons name="remove" size={24} color={theme.text} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={onIncrement}
+              style={[
+                styles.waterButton,
+                { backgroundColor: theme.buttonBackground },
+              ]}
+            >
+              <Ionicons name="add" size={24} color={theme.text} />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -136,6 +138,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingStart: 6,
   },
   waterButton: {
     width: 44,
@@ -146,13 +149,22 @@ const styles = StyleSheet.create({
   },
   waterAmountContainer: {
     alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 4,
+  },
+  waterControlsInner: {
+    flexDirection: "row",
+    gap: 10,
   },
   waterAmount: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "600",
+    lineHeight: 32,
   },
   waterUnit: {
     fontSize: 12,
     opacity: 0.7,
+    marginTop: 6,
   },
 });

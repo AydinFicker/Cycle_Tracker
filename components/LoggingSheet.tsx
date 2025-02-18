@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   Modal,
+  ScrollView,
 } from "react-native";
 import BottomSheet, {
   BottomSheetScrollView,
@@ -25,24 +26,11 @@ import { OvulationTestModal } from "@/components/modals/OvulationTestModal";
 import { WaterSection } from "./logging/WaterSection";
 import { WeightSection } from "./logging/WeightSection";
 import { DefaultButton } from "./buttons/DefaultButton";
+import { LoggingData } from "@/types/logging";
 
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
   onClose: () => void;
-}
-
-interface SelectedOptions {
-  [key: string]: {
-    selected: string[];
-    details?: {
-      testTypeId?: string;
-      resultId?: string;
-      waterAmount?: number;
-      weight?: number;
-      unit?: "lbs" | "kg";
-      [key: string]: any;
-    };
-  };
 }
 
 export const LoggingSheet: React.FC<LoggingSheetProps> = ({
@@ -53,18 +41,11 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({});
+  const [loggingData, setLoggingData] = useState<LoggingData>({});
   const [searchQuery, setSearchQuery] = useState("");
   const insets = useSafeAreaInsets();
   const [isOvulationTestModalVisible, setIsOvulationTestModalVisible] =
     useState(false);
-  const [waterAmount, setWaterAmount] = useState(0);
-  const [waterSettings, setWaterSettings] = useState({
-    dailyGoal: 72,
-    increment: 8,
-  });
-  const [weight, setWeight] = useState<number | null>(null);
-  const [weightUnit, setWeightUnit] = useState<"lbs" | "kg">("lbs");
 
   // Format the selected date for display
   const formattedDate = useMemo(() => {
@@ -107,85 +88,47 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
     [onClose, navigation]
   );
 
-  const handleOptionPress = useCallback(
-    (categoryId: string, optionId: string) => {
-      // Find the selected option
-      const category = LOGGING_CATEGORIES.find((cat) => cat.id === categoryId);
-      const option = category?.options.find((opt) => opt.id === optionId);
-
-      if (option?.modalConfig?.type === "ovulationTest") {
-        setIsOvulationTestModalVisible(true);
-      } else {
-        // Handle normal selection
-        setSelectedOptions((prev) => {
-          const currentSelected = prev[categoryId]?.selected || [];
-          const isAlreadySelected = currentSelected.includes(optionId);
-
-          if (isAlreadySelected) {
-            const newSelected = currentSelected.filter((id) => id !== optionId);
-            const newState = { ...prev };
-            if (newSelected.length === 0) {
-              delete newState[categoryId];
-            } else {
-              newState[categoryId] = { selected: newSelected };
-            }
-            return newState;
-          } else {
-            return {
-              ...prev,
-              [categoryId]: {
-                selected: [...currentSelected, optionId],
-              },
-            };
-          }
-        });
-      }
-    },
-    []
-  );
-
-  const handleWaterChange = useCallback((amount: number) => {
-    setWaterAmount(amount);
-    setSelectedOptions((prev) => ({
+  // Water tracking state management
+  const handleWaterChange = (amount: number) => {
+    setLoggingData((prev) => ({
       ...prev,
       water_tracking: {
-        selected: ["log_water"],
-        details: {
-          waterAmount: amount,
-        },
+        selected: true,
+        timestamp: new Date(),
+        details: { waterAmount: amount },
       },
     }));
-  }, []);
+  };
 
-  const handleWaterSettingsChange = useCallback(
-    (settings: { dailyGoal: number; increment: number }) => {
-      setWaterSettings(settings);
-    },
-    []
-  );
+  // Weight tracking state management
+  const handleWeightChange = (weight: number | null, unit: "lbs" | "kg") => {
+    setLoggingData((prev) => ({
+      ...prev,
+      weight_tracking: {
+        selected: true,
+        timestamp: new Date(),
+        details: { weight, unit },
+      },
+    }));
+  };
 
-  const handleWeightChange = useCallback(
-    (newWeight: number | null, newUnit: "lbs" | "kg") => {
-      setWeight(newWeight);
-      setWeightUnit(newUnit);
-      setSelectedOptions((prev) => {
-        const newState = { ...prev };
-        if (newWeight === null) {
-          delete newState.weight_tracking;
-        } else {
-          newState.weight_tracking = {
-            selected: ["log_weight"],
-            details: {
-              weight: newWeight,
-              unit: newUnit,
-            },
-          };
-        }
-        return newState;
-      });
-    },
-    []
-  );
+  // Regular category option handling
+  const handleOptionPress = (optionId: string) => {
+    setLoggingData((prev) => {
+      const currentOption = prev[optionId];
+      if (currentOption?.selected) {
+        const { [optionId]: _, ...rest } = prev;
+        return rest;
+      }
+      return {
+        ...prev,
+        [optionId]: {
+          selected: true,
+          timestamp: new Date(),
+        },
+      };
+    });
+  };
 
   const handleModalSubmit = useCallback(
     (data: { testTypeId: string; resultId: string }) => {
@@ -193,10 +136,11 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
       console.log("Modal data submitted:", data);
 
       // Mark the "Log ovulation test" option as selected and store the detailed data
-      setSelectedOptions((prev) => ({
+      setLoggingData((prev) => ({
         ...prev,
         ovulation_test: {
-          selected: ["log_test"],
+          selected: true,
+          timestamp: new Date(),
           details: {
             testTypeId: data.testTypeId,
             resultId: data.resultId,
@@ -210,24 +154,11 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
     []
   );
 
-  const handleApply = useCallback(() => {
-    // Prepare data for API call
-    const apiData = Object.entries(selectedOptions).map(
-      ([categoryId, data]) => ({
-        categoryId,
-        selected: data.selected,
-        details: data.details,
-        // timestamp: selectedDate,
-      })
-    );
-
-    // Log the data that would be sent to the API
-    console.log("Sending to API:", apiData);
-
-    // Clear selections after successful API call
-    setSelectedOptions({});
+  const handleApply = () => {
+    console.log("Submitting logging data:", loggingData);
+    // TODO: Add actual API call here
     onClose();
-  }, [selectedOptions, selectedDate, onClose]);
+  };
 
   const renderBackdrop = useCallback(
     (props: any) => (
@@ -256,7 +187,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
       .filter((category) => category.options.length > 0);
   }, [searchQuery]);
 
-  const hasSelections = Object.keys(selectedOptions).length > 0;
+  const hasSelectedOptions = Object.keys(loggingData).length > 0;
 
   return (
     <>
@@ -285,7 +216,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
                     const newDate = new Date(selectedDate);
                     newDate.setDate(newDate.getDate() - 1);
                     setSelectedDate(newDate);
-                    setSelectedOptions({});
+                    setLoggingData({});
                   }}
                   style={[styles.dateArrow, styles.leftArrow]}
                 >
@@ -298,7 +229,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
                     newDate.setDate(newDate.getDate() + 1);
                     if (!isFuture(newDate)) {
                       setSelectedDate(newDate);
-                      setSelectedOptions({});
+                      setLoggingData({});
                     }
                   }}
                   style={[
@@ -360,45 +291,66 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
                 <ThemedText type="title" style={styles.categoryTitle}>
                   Categories
                 </ThemedText>
-                <ThemedText style={styles.editButton}>Edit</ThemedText>
               </View>
 
-              {filteredCategories.map((category) => (
-                <LoggingCategory
-                  key={category.id}
-                  category={category}
-                  selectedOptions={selectedOptions[category.id]?.selected || []}
-                  onOptionPress={(optionId) =>
-                    handleOptionPress(category.id, optionId)
-                  }
-                />
-              ))}
-
-              <WaterSection
-                waterAmount={waterAmount}
-                onIncrement={() =>
-                  handleWaterChange(waterAmount + waterSettings.increment)
+              {LOGGING_CATEGORIES.map((category) => {
+                if (category.id === "tracking_essentials") {
+                  // Render custom components for tracking essentials
+                  return (
+                    <View key={category.id}>
+                      <WaterSection
+                        waterAmount={
+                          loggingData.water_tracking?.details?.waterAmount ?? 0
+                        }
+                        onIncrement={() => {
+                          const currentAmount =
+                            loggingData.water_tracking?.details?.waterAmount ??
+                            0;
+                          handleWaterChange(currentAmount + 8);
+                        }}
+                        onDecrement={() => {
+                          const currentAmount =
+                            loggingData.water_tracking?.details?.waterAmount ??
+                            0;
+                          if (currentAmount > 0) {
+                            handleWaterChange(currentAmount - 8);
+                          }
+                        }}
+                        dailyGoal={72}
+                        increment={8}
+                        onSettingsChange={({ dailyGoal, increment }) => {
+                          // Handle settings change
+                        }}
+                      />
+                      <WeightSection
+                        weight={
+                          loggingData.weight_tracking?.details?.weight ?? null
+                        }
+                        unit={
+                          loggingData.weight_tracking?.details?.unit ?? "kg"
+                        }
+                        onWeightChange={handleWeightChange}
+                        defaultWeight={60}
+                      />
+                    </View>
+                  );
                 }
-                onDecrement={() =>
-                  handleWaterChange(
-                    Math.max(0, waterAmount - waterSettings.increment)
-                  )
-                }
-                dailyGoal={waterSettings.dailyGoal}
-                increment={waterSettings.increment}
-                onSettingsChange={handleWaterSettingsChange}
-              />
 
-              <WeightSection
-                weight={weight}
-                unit={weightUnit}
-                onWeightChange={handleWeightChange}
-              />
+                // Render regular categories
+                return (
+                  <LoggingCategory
+                    key={category.id}
+                    category={category}
+                    selectedOptions={Object.keys(loggingData)}
+                    onOptionPress={handleOptionPress}
+                  />
+                );
+              })}
             </View>
           </BottomSheetScrollView>
 
           <AnimatedApplyButton
-            isVisible={hasSelections}
+            isVisible={hasSelectedOptions}
             onPress={handleApply}
             onClose={onClose}
           />
@@ -475,10 +427,6 @@ const styles = StyleSheet.create({
   },
   categoryTitle: {
     fontSize: 24,
-  },
-  editButton: {
-    color: "#FF69B4",
-    fontSize: 16,
   },
   dateNavigator: {
     width: "100%",

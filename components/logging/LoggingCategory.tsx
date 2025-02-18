@@ -23,6 +23,11 @@ export const LoggingCategory: React.FC<LoggingCategoryProps> = ({
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
+  // Skip rendering if this is a standalone category
+  if (category.isStandalone) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <View

@@ -1,4 +1,5 @@
 import { LoggingCategory } from "@/types/logging";
+import { Colors } from "./Colors";
 
 export const LOGGING_CATEGORIES: LoggingCategory[] = [
   {
@@ -435,6 +436,34 @@ export const LOGGING_CATEGORIES: LoggingCategory[] = [
         icon: "add-circle",
         backgroundColor: "#E0F0FF",
         hasAddButton: true,
+      },
+    ],
+  },
+  {
+    id: "tracking_essentials",
+    title: "Daily Tracking",
+    backgroundColor: "#E0F4F4", // Light teal
+    isStandalone: true,
+    options: [
+      {
+        id: "water_tracking",
+        label: "Water Intake",
+        icon: "water",
+        backgroundColor: "#E0F4F4",
+        hasCustomComponent: true,
+        modalConfig: {
+          type: "water",
+        },
+      },
+      {
+        id: "weight_tracking",
+        label: "Weight",
+        icon: "scale",
+        backgroundColor: "#E6E6FA",
+        hasCustomComponent: true,
+        modalConfig: {
+          type: "weight",
+        },
       },
     ],
   },

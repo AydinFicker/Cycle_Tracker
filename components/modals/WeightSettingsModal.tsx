@@ -16,24 +16,31 @@ import { SmallTextButton } from "../buttons/SmallTextButton";
 interface WeightSettingsModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSubmit: (weight: number | null, unit: "lbs" | "kg") => void;
+  onSubmit: (newWeight: number | null, newUnit: "lbs" | "kg") => void;
   currentWeight: number | null;
   currentUnit: "lbs" | "kg";
+  defaultWeight?: number;
 }
 
 export const WeightSettingsModal: React.FC<WeightSettingsModalProps> = ({
   isVisible,
   onClose,
   onSubmit,
-  currentWeight = 60,
-  currentUnit = "kg",
+  currentWeight,
+  currentUnit,
+  defaultWeight = 60,
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
   const [selectedUnit, setSelectedUnit] = useState<"lbs" | "kg">(currentUnit);
-  const [wholeNumber, setWholeNumber] = useState("0");
-  const [decimal, setDecimal] = useState("0");
+  const initialWeight = currentWeight ?? defaultWeight;
+  const [wholeNumber, setWholeNumber] = useState(
+    Math.floor(initialWeight).toString()
+  );
+  const [decimal, setDecimal] = useState(
+    (initialWeight % 1).toFixed(1).split(".")[1]
+  );
 
   // Convert between lbs and kg
   const convertWeight = (

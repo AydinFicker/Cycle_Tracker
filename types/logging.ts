@@ -25,6 +25,7 @@ export interface LoggingOption {
   hasAddButton?: boolean;
   hidden?: boolean; // For options that are only selected through modals
   modalConfig?: ModalConfig;
+  hasCustomComponent?: boolean; // Flag for options that use custom components like Water/Weight
 }
 
 export interface LoggingCategory {
@@ -33,6 +34,7 @@ export interface LoggingCategory {
   description?: string;
   backgroundColor: string;
   isGrid?: boolean;
+  isStandalone?: boolean; // Flag for categories that should be rendered separately
   options: LoggingOption[];
 }
 
@@ -40,6 +42,13 @@ export type LoggingData = {
   [key: string]: {
     selected: boolean;
     timestamp: Date;
-    value?: any; // For additional data if needed
+    details?: {
+      waterAmount?: number;
+      weight?: number | null;
+      unit?: "lbs" | "kg";
+      testTypeId?: string;
+      resultId?: string;
+      [key: string]: any;
+    };
   };
 };

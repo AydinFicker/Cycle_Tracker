@@ -14,12 +14,14 @@ interface WeightSectionProps {
   weight: number | null;
   unit: "lbs" | "kg";
   onWeightChange: (weight: number | null, unit: "lbs" | "kg") => void;
+  defaultWeight?: number;
 }
 
 export const WeightSection: React.FC<WeightSectionProps> = ({
   weight,
   unit,
   onWeightChange,
+  defaultWeight = 60,
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
@@ -80,6 +82,7 @@ export const WeightSection: React.FC<WeightSectionProps> = ({
           onSubmit={handleWeightSubmit}
           currentWeight={weight}
           currentUnit={unit}
+          defaultWeight={defaultWeight}
         />
       </View>
     </View>

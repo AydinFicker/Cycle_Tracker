@@ -10,16 +10,13 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { PillSettingsModal } from "../modals/PillSettingsModal";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { format } from "date-fns";
 
 export interface Pill {
   id: string;
   name: string;
   intakes: number;
   intakeNumber: number;
-  reminderTime: string | null;
-  icon: "pill" | "capsule" | "tablet" | "oval";
+  reminderTimes: (string | null)[];
   taken: boolean;
 }
 
@@ -28,8 +25,7 @@ interface PillSectionProps {
   onPillAdd: (pill: {
     name: string;
     intakes: number;
-    reminderTime: string | null;
-    icon: "pill" | "capsule" | "tablet" | "oval";
+    reminderTimes: (string | null)[];
   }) => void;
   onPillTake: (pillId: string) => void;
 }
@@ -50,11 +46,17 @@ export const PillSection: React.FC<PillSectionProps> = ({
   const handlePillSubmit = (pillData: {
     name: string;
     intakes: number;
-    reminderTime: string | null;
-    icon: "pill" | "capsule" | "tablet" | "oval";
+    reminderTimes: (string | null)[];
   }) => {
     onPillAdd(pillData);
     setIsModalVisible(false);
+  };
+
+  const handlePillPress = (pillId: string) => {
+    const pill = pills.find((p) => p.id === pillId);
+    if (!pill) return;
+
+    onPillTake(pillId);
   };
 
   const groupedPills = pills.reduce<{ [key: string]: Pill[] }>((acc, pill) => {
@@ -106,7 +108,7 @@ export const PillSection: React.FC<PillSectionProps> = ({
                           : theme.buttonBackground,
                       },
                     ]}
-                    onPress={() => onPillTake(pill.id)}
+                    onPress={() => handlePillPress(pill.id)}
                   >
                     <Ionicons
                       name={pill.taken ? "checkmark" : "medical"}

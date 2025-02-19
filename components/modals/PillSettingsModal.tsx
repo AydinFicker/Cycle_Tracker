@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   View,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Switch,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
@@ -15,7 +16,7 @@ import { DefaultButton } from "../buttons/DefaultButton";
 import { SmallTextButton } from "../buttons/SmallTextButton";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import type { Pill } from "../logging/PillSection";
 
 interface PillSettingsModalProps {
@@ -24,12 +25,9 @@ interface PillSettingsModalProps {
   onSubmit: (pillData: {
     name: string;
     intakes: number;
-    reminderTime: string | null;
-    icon: "pill" | "capsule" | "tablet" | "oval";
+    reminderTimes: (string | null)[];
   }) => void;
 }
-
-const PILL_ICONS: Pill["icon"][] = ["pill", "capsule", "tablet", "oval"];
 
 export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
   isVisible,
@@ -41,49 +39,79 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
 
   const [name, setName] = useState("");
   const [intakes, setIntakes] = useState(1);
-  const [reminderTime, setReminderTime] = useState<string | null>("12:00");
-  const [selectedIcon, setSelectedIcon] = useState<
-    "pill" | "capsule" | "tablet" | "oval"
-  >("pill");
+  const [reminderTimes, setReminderTimes] = useState<(string | null)[]>([
+    "12:00",
+  ]);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedTimeIndex, setSelectedTimeIndex] = useState<number>(0);
+  const [remindersEnabled, setRemindersEnabled] = useState(true);
+
+  // Update reminder times array when intakes change
+  useEffect(() => {
+    setReminderTimes((prev) => {
+      const newTimes = [...prev];
+      if (intakes > prev.length) {
+        // Add new times
+        for (let i = prev.length; i < intakes; i++) {
+          newTimes.push("12:00");
+        }
+      } else if (intakes < prev.length) {
+        // Remove extra times
+        newTimes.splice(intakes);
+      }
+      return newTimes;
+    });
+  }, [intakes]);
 
   const handleSave = () => {
-    if (name.trim()) {
+    const trimmedName = name.trim();
+    if (trimmedName) {
       onSubmit({
-        name: name.trim(),
+        name: trimmedName,
         intakes,
-        reminderTime,
-        icon: selectedIcon,
+        reminderTimes: remindersEnabled
+          ? reminderTimes
+          : reminderTimes.map(() => null),
       });
-
-      // Reset form
+      // Reset state
       setName("");
       setIntakes(1);
-      setReminderTime("12:00");
-      setSelectedIcon("pill");
+      setReminderTimes(["12:00"]);
+      setRemindersEnabled(true);
+      onClose();
     }
   };
 
   const handleIntakeChange = (increment: number) => {
-    setIntakes(Math.max(1, intakes + increment));
+    setIntakes((prev) => Math.max(1, Math.min(prev + increment, 5)));
   };
 
-  const handleTimePress = () => {
-    if (reminderTime !== null) {
-      setShowTimePicker(true);
-    }
+  const handleTimePress = (index: number) => {
+    setSelectedTimeIndex(index);
+    setShowTimePicker(true);
   };
 
   const handleTimeChange = (event: any, selectedDate?: Date) => {
     setShowTimePicker(false);
     if (selectedDate) {
-      const timeString = format(selectedDate, "HH:mm");
-      setReminderTime(timeString);
+      setReminderTimes((prev) => {
+        const newTimes = [...prev];
+        newTimes[selectedTimeIndex] = format(selectedDate, "HH:mm");
+        return newTimes;
+      });
     }
   };
 
-  const toggleReminder = () => {
-    setReminderTime(reminderTime === null ? "12:00" : null);
+  const handleRemoveReminder = (index: number) => {
+    setReminderTimes((prev) => {
+      const newTimes = [...prev];
+      newTimes[index] = null;
+      return newTimes;
+    });
+  };
+
+  const toggleReminders = () => {
+    setRemindersEnabled((prev) => !prev);
   };
 
   if (!isVisible) return null;
@@ -115,7 +143,7 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
             <View style={styles.placeholder} />
           </View>
 
-          <ScrollView style={styles.scrollContent}>
+          <ScrollView>
             {/* Name Input */}
             <View style={styles.inputSection}>
               <ThemedText style={styles.label}>Pill Name</ThemedText>
@@ -130,16 +158,14 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
                 value={name}
                 onChangeText={setName}
                 placeholder="Enter pill name"
-                placeholderTextColor={theme.tabIconDefault}
+                placeholderTextColor={theme.darkgrey}
               />
             </View>
 
-            {/* Intakes Input */}
+            {/* Intake Number */}
             <View style={styles.inputSection}>
-              <ThemedText style={styles.label}>
-                Number of intakes per day
-              </ThemedText>
-              <View style={styles.intakeControls}>
+              <ThemedText style={styles.label}>Number of Intakes</ThemedText>
+              <View style={styles.intakeContainer}>
                 <TouchableOpacity
                   onPress={() => handleIntakeChange(-1)}
                   style={[
@@ -148,7 +174,11 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
                   ]}
                   disabled={intakes <= 1}
                 >
-                  <Ionicons name="remove" size={24} color={theme.text} />
+                  <Ionicons
+                    name="remove"
+                    size={24}
+                    color={intakes <= 1 ? theme.darkgrey : theme.text}
+                  />
                 </TouchableOpacity>
                 <ThemedText style={styles.intakeNumber}>{intakes}</ThemedText>
                 <TouchableOpacity
@@ -159,84 +189,72 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
                   ]}
                   disabled={intakes >= 5}
                 >
-                  <Ionicons name="add" size={24} color={theme.text} />
+                  <Ionicons
+                    name="add"
+                    size={24}
+                    color={intakes >= 5 ? theme.darkgrey : theme.text}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
 
-            {/* Reminder Time */}
+            {/* Reminder Times */}
             <View style={styles.inputSection}>
               <View style={styles.reminderHeader}>
-                <ThemedText style={styles.label}>Reminder Time</ThemedText>
-                <TouchableOpacity
-                  style={[
-                    styles.toggleButton,
-                    { backgroundColor: theme.buttonBackground },
-                  ]}
-                  onPress={toggleReminder}
-                >
-                  <Ionicons
-                    name={
-                      reminderTime === null
-                        ? "notifications-off"
-                        : "notifications"
-                    }
-                    size={20}
-                    color={reminderTime === null ? theme.red : theme.red}
-                  />
-                </TouchableOpacity>
+                <ThemedText style={styles.label}>Reminders</ThemedText>
+                <Switch
+                  value={remindersEnabled}
+                  onValueChange={toggleReminders}
+                  trackColor={{ false: theme.darkgrey, true: theme.yellow }}
+                  thumbColor={theme.white}
+                />
               </View>
-              {reminderTime !== null && (
-                <TouchableOpacity
-                  style={[
-                    styles.timeButton,
-                    { backgroundColor: theme.buttonBackground },
-                  ]}
-                  onPress={handleTimePress}
-                >
-                  <Ionicons
-                    name="time"
-                    size={20}
-                    color={theme.red}
-                    style={styles.timeIcon}
-                  />
-                  <ThemedText style={styles.timeText}>
-                    {reminderTime}
-                  </ThemedText>
-                </TouchableOpacity>
+              {remindersEnabled && (
+                <View style={styles.reminderTimesContainer}>
+                  {reminderTimes.map((time, index) => (
+                    <View key={index} style={styles.reminderTimeContainer}>
+                      {time === null ? (
+                        <TouchableOpacity
+                          onPress={() => handleTimePress(index)}
+                          style={[
+                            styles.timeButton,
+                            styles.addReminderButton,
+                            { backgroundColor: theme.buttonBackground },
+                          ]}
+                        >
+                          <Ionicons name="add" size={24} color={theme.blue} />
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => handleTimePress(index)}
+                          style={[
+                            styles.timeButton,
+                            { backgroundColor: theme.buttonBackground },
+                          ]}
+                        >
+                          <ThemedText>
+                            {format(parse(time, "HH:mm", new Date()), "h:mm a")}
+                          </ThemedText>
+                        </TouchableOpacity>
+                      )}
+                      {!reminderTimes[index] === false && (
+                        <TouchableOpacity
+                          onPress={() => handleRemoveReminder(index)}
+                          style={styles.removeButton}
+                        >
+                          <Ionicons
+                            name={
+                              time === null ? "close-circle" : "close-circle"
+                            }
+                            size={24}
+                            color={theme.red}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  ))}
+                </View>
               )}
-            </View>
-
-            {/* Icon Selection */}
-            <View style={styles.inputSection}>
-              <ThemedText style={styles.label}>Pill Type</ThemedText>
-              <View style={styles.iconContainer}>
-                {PILL_ICONS.map((icon) => (
-                  <TouchableOpacity
-                    key={icon}
-                    style={[
-                      styles.iconButton,
-                      {
-                        backgroundColor: theme.buttonBackground,
-                        borderColor:
-                          selectedIcon === icon ? theme.red : "transparent",
-                      },
-                    ]}
-                    onPress={() => setSelectedIcon(icon)}
-                  >
-                    <Ionicons
-                      name={
-                        icon === selectedIcon ? "medical" : "medical-outline"
-                      }
-                      size={24}
-                      color={theme.red}
-                    />
-                    <ThemedText style={styles.iconText}>
-                      {icon.charAt(0).toUpperCase() + icon.slice(1)}
-                    </ThemedText>
-                  </TouchableOpacity>
-                ))}
-              </View>
             </View>
           </ScrollView>
 
@@ -249,41 +267,41 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
           >
             Add Pill
           </DefaultButton>
+
+          {/* Time Picker */}
+          {showTimePicker && Platform.OS === "ios" && (
+            <View
+              style={[
+                styles.timePickerContainer,
+                { backgroundColor: theme.modalBackground },
+              ]}
+            >
+              <DateTimePicker
+                value={
+                  reminderTimes[selectedTimeIndex]
+                    ? new Date(`2000-01-01T${reminderTimes[selectedTimeIndex]}`)
+                    : new Date()
+                }
+                mode="time"
+                display="spinner"
+                onChange={handleTimeChange}
+              />
+            </View>
+          )}
+          {showTimePicker && Platform.OS === "android" && (
+            <DateTimePicker
+              value={
+                reminderTimes[selectedTimeIndex]
+                  ? new Date(`2000-01-01T${reminderTimes[selectedTimeIndex]}`)
+                  : new Date()
+              }
+              mode="time"
+              display="default"
+              onChange={handleTimeChange}
+            />
+          )}
         </View>
       </View>
-
-      {showTimePicker && Platform.OS === "ios" ? (
-        <View
-          style={[
-            styles.timePickerContainer,
-            { backgroundColor: theme.modalBackground },
-          ]}
-        >
-          <DateTimePicker
-            value={new Date(`2000-01-01T${reminderTime}`)}
-            mode="time"
-            is24Hour={true}
-            onChange={handleTimeChange}
-            display="spinner"
-          />
-          <DefaultButton
-            onPress={() => setShowTimePicker(false)}
-            defaultColor={theme.yellow}
-            defaultTextColor={theme.white}
-          >
-            Done
-          </DefaultButton>
-        </View>
-      ) : (
-        showTimePicker && (
-          <DateTimePicker
-            value={new Date(`2000-01-01T${reminderTime}`)}
-            mode="time"
-            is24Hour={true}
-            onChange={handleTimeChange}
-          />
-        )
-      )}
     </Modal>
   );
 };
@@ -318,21 +336,8 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 50,
   },
-  scrollContent: {
-    marginBottom: 20,
-  },
   inputSection: {
     marginBottom: 20,
-  },
-  reminderHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  toggleButton: {
-    padding: 8,
-    borderRadius: 8,
   },
   label: {
     fontSize: 16,
@@ -345,7 +350,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
   },
-  intakeControls: {
+  intakeContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -364,35 +369,30 @@ const styles = StyleSheet.create({
     width: 30,
     textAlign: "center",
   },
+  reminderHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  reminderTimesContainer: {
+    gap: 12,
+  },
+  reminderTimeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
   timeButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 12,
-  },
-  timeIcon: {
-    marginRight: 8,
-  },
-  timeText: {
-    fontSize: 16,
-  },
-  iconContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  iconButton: {
     flex: 1,
-    minWidth: "45%",
-    flexDirection: "row",
-    alignItems: "center",
     padding: 12,
     borderRadius: 12,
-    gap: 8,
-    borderWidth: 2,
+    alignItems: "center",
   },
-  iconText: {
-    fontSize: 14,
+  addReminderButton: {
+    borderWidth: 2,
+    borderColor: Colors.light.blue,
+    borderStyle: "dashed",
   },
   saveButton: {
     marginTop: 20,
@@ -405,5 +405,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+  },
+  removeButton: {
+    padding: 4,
   },
 });

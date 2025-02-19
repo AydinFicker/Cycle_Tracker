@@ -203,8 +203,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   const handlePillAdd = (pillData: {
     name: string;
     intakes: number;
-    reminderTime: string | null;
-    icon: "pill" | "capsule" | "tablet" | "oval";
+    reminderTimes: (string | null)[];
   }) => {
     // Create multiple pill instances with sequential intake numbers
     for (let i = 1; i <= pillData.intakes; i++) {
@@ -230,6 +229,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
       const updatedPills = pills.map((pill) =>
         pill.id === pillId ? { ...pill, taken: !pill.taken } : pill
       );
+
       const takenPills = updatedPills.filter((pill) => pill.taken);
 
       if (takenPills.length > 0) {
@@ -241,10 +241,11 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
             details: {
               pills: takenPills.map((pill) => ({
                 id: pill.id,
-                name: pill.name.replace(/\s+\d+$/, ""), // Remove trailing numbers
+                name: pill.name,
+                intakes: pill.intakes,
                 intakeNumber: pill.intakeNumber,
+                reminderTimes: pill.reminderTimes,
                 taken: true,
-                icon: pill.icon,
               })),
             },
           },

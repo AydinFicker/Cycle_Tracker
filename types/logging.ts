@@ -12,9 +12,10 @@ export interface TestType {
 export interface Pill {
   id: string;
   name: string;
+  intakes: number;
   intakeNumber: number;
+  reminderTimes: (string | null)[];
   taken: boolean;
-  icon: "pill" | "capsule" | "tablet" | "oval";
 }
 
 export interface ModalConfig {

@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
@@ -20,7 +21,12 @@ import type { Pill } from "../logging/PillSection";
 interface PillSettingsModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSubmit: (pillData: Omit<Pill, "id" | "taken">) => void;
+  onSubmit: (pillData: {
+    name: string;
+    intakes: number;
+    reminderTime: string | null;
+    icon: "pill" | "capsule" | "tablet" | "oval";
+  }) => void;
 }
 
 const PILL_ICONS: Pill["icon"][] = ["pill", "capsule", "tablet", "oval"];
@@ -35,48 +41,49 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
 
   const [name, setName] = useState("");
   const [intakes, setIntakes] = useState(1);
-  const [reminderTimes, setReminderTimes] = useState<Date[]>([new Date()]);
-  const [selectedIcon, setSelectedIcon] = useState<Pill["icon"]>("pill");
+  const [reminderTime, setReminderTime] = useState<string | null>("12:00");
+  const [selectedIcon, setSelectedIcon] = useState<
+    "pill" | "capsule" | "tablet" | "oval"
+  >("pill");
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [activeTimeIndex, setActiveTimeIndex] = useState(0);
 
   const handleSave = () => {
-    if (!name) return;
+    if (name.trim()) {
+      onSubmit({
+        name: name.trim(),
+        intakes,
+        reminderTime,
+        icon: selectedIcon,
+      });
 
-    onSubmit({
-      name,
-      intakes,
-      reminderTimes: reminderTimes.map((time) => format(time, "HH:mm")),
-      icon: selectedIcon,
-      intakeNumber: 1,
-    });
-
-    // Reset form
-    setName("");
-    setIntakes(1);
-    setReminderTimes([new Date()]);
-    setSelectedIcon("pill");
+      // Reset form
+      setName("");
+      setIntakes(1);
+      setReminderTime("12:00");
+      setSelectedIcon("pill");
+    }
   };
 
   const handleIntakeChange = (increment: number) => {
-    const newIntakes = Math.max(1, intakes + increment);
-    setIntakes(newIntakes);
+    setIntakes(Math.max(1, intakes + increment));
+  };
 
-    // Adjust reminder times array
-    if (newIntakes > reminderTimes.length) {
-      setReminderTimes([...reminderTimes, new Date()]);
-    } else {
-      setReminderTimes(reminderTimes.slice(0, newIntakes));
+  const handleTimePress = () => {
+    if (reminderTime !== null) {
+      setShowTimePicker(true);
     }
   };
 
   const handleTimeChange = (event: any, selectedDate?: Date) => {
     setShowTimePicker(false);
     if (selectedDate) {
-      const newTimes = [...reminderTimes];
-      newTimes[activeTimeIndex] = selectedDate;
-      setReminderTimes(newTimes);
+      const timeString = format(selectedDate, "HH:mm");
+      setReminderTime(timeString);
     }
+  };
+
+  const toggleReminder = () => {
+    setReminderTime(reminderTime === null ? "12:00" : null);
   };
 
   if (!isVisible) return null;
@@ -105,11 +112,12 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
             <ThemedText type="title" style={styles.title}>
               Add Pill
             </ThemedText>
+            <View style={styles.placeholder} />
           </View>
 
-          <ScrollView style={styles.form}>
-            {/* Pill Name */}
-            <View style={styles.inputGroup}>
+          <ScrollView style={styles.scrollContent}>
+            {/* Name Input */}
+            <View style={styles.inputSection}>
               <ThemedText style={styles.label}>Pill Name</ThemedText>
               <TextInput
                 style={[
@@ -122,14 +130,87 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
                 value={name}
                 onChangeText={setName}
                 placeholder="Enter pill name"
-                placeholderTextColor={theme.darkgrey}
+                placeholderTextColor={theme.tabIconDefault}
               />
             </View>
 
-            {/* Pill Icon Selection */}
-            <View style={styles.inputGroup}>
+            {/* Intakes Input */}
+            <View style={styles.inputSection}>
+              <ThemedText style={styles.label}>
+                Number of intakes per day
+              </ThemedText>
+              <View style={styles.intakeControls}>
+                <TouchableOpacity
+                  onPress={() => handleIntakeChange(-1)}
+                  style={[
+                    styles.intakeButton,
+                    { backgroundColor: theme.buttonBackground },
+                  ]}
+                  disabled={intakes <= 1}
+                >
+                  <Ionicons name="remove" size={24} color={theme.text} />
+                </TouchableOpacity>
+                <ThemedText style={styles.intakeNumber}>{intakes}</ThemedText>
+                <TouchableOpacity
+                  onPress={() => handleIntakeChange(1)}
+                  style={[
+                    styles.intakeButton,
+                    { backgroundColor: theme.buttonBackground },
+                  ]}
+                  disabled={intakes >= 5}
+                >
+                  <Ionicons name="add" size={24} color={theme.text} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Reminder Time */}
+            <View style={styles.inputSection}>
+              <View style={styles.reminderHeader}>
+                <ThemedText style={styles.label}>Reminder Time</ThemedText>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleButton,
+                    { backgroundColor: theme.buttonBackground },
+                  ]}
+                  onPress={toggleReminder}
+                >
+                  <Ionicons
+                    name={
+                      reminderTime === null
+                        ? "notifications-off"
+                        : "notifications"
+                    }
+                    size={20}
+                    color={reminderTime === null ? theme.red : theme.red}
+                  />
+                </TouchableOpacity>
+              </View>
+              {reminderTime !== null && (
+                <TouchableOpacity
+                  style={[
+                    styles.timeButton,
+                    { backgroundColor: theme.buttonBackground },
+                  ]}
+                  onPress={handleTimePress}
+                >
+                  <Ionicons
+                    name="time"
+                    size={20}
+                    color={theme.red}
+                    style={styles.timeIcon}
+                  />
+                  <ThemedText style={styles.timeText}>
+                    {reminderTime}
+                  </ThemedText>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Icon Selection */}
+            <View style={styles.inputSection}>
               <ThemedText style={styles.label}>Pill Type</ThemedText>
-              <View style={styles.iconGrid}>
+              <View style={styles.iconContainer}>
                 {PILL_ICONS.map((icon) => (
                   <TouchableOpacity
                     key={icon}
@@ -138,66 +219,24 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
                       {
                         backgroundColor: theme.buttonBackground,
                         borderColor:
-                          selectedIcon === icon ? theme.blue : "transparent",
+                          selectedIcon === icon ? theme.red : "transparent",
                       },
                     ]}
                     onPress={() => setSelectedIcon(icon)}
                   >
                     <Ionicons
-                      name={icon === "pill" ? "medical" : "medical-outline"}
+                      name={
+                        icon === selectedIcon ? "medical" : "medical-outline"
+                      }
                       size={24}
-                      color={theme.blue}
+                      color={theme.red}
                     />
+                    <ThemedText style={styles.iconText}>
+                      {icon.charAt(0).toUpperCase() + icon.slice(1)}
+                    </ThemedText>
                   </TouchableOpacity>
                 ))}
               </View>
-            </View>
-
-            {/* Number of Intakes */}
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Number of Intakes</ThemedText>
-              <View style={styles.intakeControls}>
-                <TouchableOpacity
-                  style={[
-                    styles.intakeButton,
-                    { backgroundColor: theme.buttonBackground },
-                  ]}
-                  onPress={() => handleIntakeChange(-1)}
-                  disabled={intakes <= 1}
-                >
-                  <Ionicons name="remove" size={24} color={theme.text} />
-                </TouchableOpacity>
-                <ThemedText style={styles.intakeCount}>{intakes}</ThemedText>
-                <TouchableOpacity
-                  style={[
-                    styles.intakeButton,
-                    { backgroundColor: theme.buttonBackground },
-                  ]}
-                  onPress={() => handleIntakeChange(1)}
-                >
-                  <Ionicons name="add" size={24} color={theme.text} />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Reminder Times */}
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Reminder Times</ThemedText>
-              {reminderTimes.map((time, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.timeButton,
-                    { backgroundColor: theme.buttonBackground },
-                  ]}
-                  onPress={() => {
-                    setActiveTimeIndex(index);
-                    setShowTimePicker(true);
-                  }}
-                >
-                  <ThemedText>{format(time, "h:mm a")}</ThemedText>
-                </TouchableOpacity>
-              ))}
             </View>
           </ScrollView>
 
@@ -210,17 +249,41 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
           >
             Add Pill
           </DefaultButton>
-
-          {showTimePicker && (
-            <DateTimePicker
-              value={reminderTimes[activeTimeIndex]}
-              mode="time"
-              is24Hour={false}
-              onChange={handleTimeChange}
-            />
-          )}
         </View>
       </View>
+
+      {showTimePicker && Platform.OS === "ios" ? (
+        <View
+          style={[
+            styles.timePickerContainer,
+            { backgroundColor: theme.modalBackground },
+          ]}
+        >
+          <DateTimePicker
+            value={new Date(`2000-01-01T${reminderTime}`)}
+            mode="time"
+            is24Hour={true}
+            onChange={handleTimeChange}
+            display="spinner"
+          />
+          <DefaultButton
+            onPress={() => setShowTimePicker(false)}
+            defaultColor={theme.yellow}
+            defaultTextColor={theme.white}
+          >
+            Done
+          </DefaultButton>
+        </View>
+      ) : (
+        showTimePicker && (
+          <DateTimePicker
+            value={new Date(`2000-01-01T${reminderTime}`)}
+            mode="time"
+            is24Hour={true}
+            onChange={handleTimeChange}
+          />
+        )
+      )}
     </Modal>
   );
 };
@@ -232,35 +295,44 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    width: "100%",
-    height: "80%",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingBottom: 40,
+    maxHeight: "90%",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 30,
-    position: "relative",
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
   title: {
     textAlign: "center",
     fontSize: 20,
-    flex: 1,
   },
   cancelText: {
     fontSize: 16,
     fontWeight: "500",
-    position: "absolute",
-    left: 0,
-    zIndex: 1,
   },
-  form: {
-    flex: 1,
+  placeholder: {
+    width: 50,
   },
-  inputGroup: {
-    marginBottom: 24,
+  scrollContent: {
+    marginBottom: 20,
+  },
+  inputSection: {
+    marginBottom: 20,
+  },
+  reminderHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  toggleButton: {
+    padding: 8,
+    borderRadius: 8,
   },
   label: {
     fontSize: 16,
@@ -273,22 +345,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
   },
-  iconGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-  },
-  iconButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-  },
   intakeControls: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 16,
   },
   intakeButton: {
@@ -298,18 +358,52 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  intakeCount: {
+  intakeNumber: {
     fontSize: 20,
     fontWeight: "600",
+    width: 30,
+    textAlign: "center",
   },
   timeButton: {
-    height: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
     borderRadius: 12,
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    justifyContent: "center",
+  },
+  timeIcon: {
+    marginRight: 8,
+  },
+  timeText: {
+    fontSize: 16,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  iconButton: {
+    flex: 1,
+    minWidth: "45%",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 12,
+    gap: 8,
+    borderWidth: 2,
+  },
+  iconText: {
+    fontSize: 14,
   },
   saveButton: {
-    marginTop: 16,
+    marginTop: 20,
+  },
+  timePickerContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
 });

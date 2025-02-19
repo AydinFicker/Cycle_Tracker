@@ -200,16 +200,21 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
 
   const hasSelectedOptions = Object.keys(loggingData).length > 0;
 
-  const handlePillAdd = (pillData: Omit<Pill, "id" | "taken">) => {
-    // Create multiple pill instances based on intakes with sequential numbers
-    const newPills = Array.from({ length: pillData.intakes }, (_, index) => ({
-      ...pillData,
-      id: `${Date.now()}-${index + 1}`,
-      intakeNumber: index + 1, // Set sequential intake numbers (1, 2, 3, etc.)
-      taken: false,
-    }));
-
-    setPills([...newPills, ...pills]);
+  const handlePillAdd = (pillData: {
+    name: string;
+    intakes: number;
+    reminderTime: string | null;
+    icon: "pill" | "capsule" | "tablet" | "oval";
+  }) => {
+    // Create multiple pill instances with sequential intake numbers
+    for (let i = 1; i <= pillData.intakes; i++) {
+      const newPill: Omit<Pill, "id"> = {
+        ...pillData,
+        intakeNumber: i,
+        taken: false,
+      };
+      setPills((prev) => [...prev, { ...newPill, id: `${Date.now()}-${i}` }]);
+    }
   };
 
   const handlePillTake = (pillId: string) => {

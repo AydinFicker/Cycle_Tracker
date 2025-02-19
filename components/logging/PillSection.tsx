@@ -10,20 +10,27 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { PillSettingsModal } from "../modals/PillSettingsModal";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { format } from "date-fns";
 
 export interface Pill {
   id: string;
   name: string;
   intakes: number;
   intakeNumber: number;
-  reminderTimes: string[];
+  reminderTime: string | null;
   icon: "pill" | "capsule" | "tablet" | "oval";
   taken: boolean;
 }
 
 interface PillSectionProps {
   pills: Pill[];
-  onPillAdd: (pill: Omit<Pill, "id" | "taken">) => void;
+  onPillAdd: (pill: {
+    name: string;
+    intakes: number;
+    reminderTime: string | null;
+    icon: "pill" | "capsule" | "tablet" | "oval";
+  }) => void;
   onPillTake: (pillId: string) => void;
 }
 
@@ -34,24 +41,20 @@ export const PillSection: React.FC<PillSectionProps> = ({
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
-  const [isSettingsModalVisible, setIsSettingsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleAddPill = () => {
-    setIsSettingsModalVisible(true);
+    setIsModalVisible(true);
   };
 
-  const handlePillSubmit = (
-    pillData: Omit<Pill, "id" | "taken" | "intakeNumber">
-  ) => {
-    // Create multiple pill instances with sequential intake numbers
-    for (let i = 1; i <= pillData.intakes; i++) {
-      onPillAdd({
-        ...pillData,
-        intakeNumber: i,
-        name: pillData.name, // Keep original name without adding numbers
-      });
-    }
-    setIsSettingsModalVisible(false);
+  const handlePillSubmit = (pillData: {
+    name: string;
+    intakes: number;
+    reminderTime: string | null;
+    icon: "pill" | "capsule" | "tablet" | "oval";
+  }) => {
+    onPillAdd(pillData);
+    setIsModalVisible(false);
   };
 
   const groupedPills = pills.reduce<{ [key: string]: Pill[] }>((acc, pill) => {
@@ -70,14 +73,12 @@ export const PillSection: React.FC<PillSectionProps> = ({
       >
         <View style={styles.header}>
           <View style={styles.titleContainer}>
-            <Ionicons name="medical" size={24} color={theme.blue} />
-            <ThemedText style={styles.title}>Other pills (non-OC)</ThemedText>
+            <Ionicons name="medical" size={24} color={theme.red} />
+            <ThemedText style={styles.title}>Pills</ThemedText>
           </View>
         </View>
 
-        <ThemedText style={styles.description}>
-          Log other pills you take a day
-        </ThemedText>
+        <ThemedText style={styles.description}>Log your daily pills</ThemedText>
 
         <ScrollView
           horizontal
@@ -85,65 +86,56 @@ export const PillSection: React.FC<PillSectionProps> = ({
           style={styles.pillsContainer}
           contentContainerStyle={styles.pillsContentContainer}
         >
-          {Object.entries(groupedPills).map(([baseName, pillGroup]) => (
+          {Object.entries(groupedPills).map(([baseName, pills]) => (
             <View key={baseName} style={styles.pillGroup}>
-              {pillGroup.map((pill) => (
-                <TouchableOpacity
-                  key={pill.id}
-                  style={[
-                    styles.pillButton,
-                    { backgroundColor: theme.buttonBackground },
-                    pill.taken && { backgroundColor: theme.blue + "20" },
-                  ]}
-                  onPress={() => onPillTake(pill.id)}
-                >
-                  <View style={styles.pillIcon}>
+              <View style={styles.pillNameContainer}>
+                <ThemedText style={styles.pillName}>{baseName}</ThemedText>
+                <ThemedText style={styles.pillCount}>
+                  {pills.length > 1 ? `${pills.length} intakes` : "1 intake"}
+                </ThemedText>
+              </View>
+              <View style={styles.pillButtonsContainer}>
+                {pills.map((pill) => (
+                  <TouchableOpacity
+                    key={pill.id}
+                    style={[
+                      styles.pillButton,
+                      {
+                        backgroundColor: pill.taken
+                          ? theme.red
+                          : theme.buttonBackground,
+                      },
+                    ]}
+                    onPress={() => onPillTake(pill.id)}
+                  >
                     <Ionicons
-                      name={
-                        pill.icon === "pill" ? "medical" : "medical-outline"
-                      }
+                      name={pill.taken ? "checkmark" : "medical"}
                       size={24}
-                      color={theme.blue}
+                      color={pill.taken ? theme.white : theme.text}
                     />
-                    {pill.taken && (
-                      <View style={styles.checkmark}>
-                        <Ionicons
-                          name="checkmark-circle"
-                          size={16}
-                          color={theme.blue}
-                        />
-                      </View>
-                    )}
-                  </View>
-                  <ThemedText style={styles.pillName}>
-                    {pill.name}
-                    {pillGroup.length > 1 ? ` ${pill.intakeNumber}` : ""}
-                  </ThemedText>
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           ))}
 
           <TouchableOpacity
             style={[
-              styles.addPillButton,
+              styles.addButton,
               { backgroundColor: theme.buttonBackground },
             ]}
             onPress={handleAddPill}
           >
-            <View style={styles.addPillIcon}>
-              <Ionicons name="add-circle" size={24} color={theme.blue} />
-            </View>
-            <ThemedText style={styles.addPillText}>Add pill</ThemedText>
+            <Ionicons name="add" size={24} color={theme.text} />
           </TouchableOpacity>
         </ScrollView>
-      </View>
 
-      <PillSettingsModal
-        isVisible={isSettingsModalVisible}
-        onClose={() => setIsSettingsModalVisible(false)}
-        onSubmit={handlePillSubmit}
-      />
+        <PillSettingsModal
+          isVisible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          onSubmit={handlePillSubmit}
+        />
+      </View>
     </View>
   );
 };
@@ -184,48 +176,49 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   pillsContainer: {
-    flexDirection: "row",
+    marginHorizontal: -16,
   },
   pillsContentContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    paddingHorizontal: 16,
+    gap: 12,
   },
   pillGroup: {
-    flexDirection: "row",
-    gap: 8,
-    marginRight: 8,
+    minWidth: 120,
   },
-  pillButton: {
-    padding: 12,
-    borderRadius: 12,
-    width: 100,
-    alignItems: "center",
-  },
-  pillIcon: {
-    position: "relative",
-    marginBottom: 4,
-  },
-  checkmark: {
-    position: "absolute",
-    bottom: -6,
-    right: -6,
-    backgroundColor: "white",
-    borderRadius: 10,
+  pillNameContainer: {
+    marginBottom: 8,
   },
   pillName: {
-    fontSize: 14,
-    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "600",
   },
-  addPillButton: {
-    padding: 12,
-    borderRadius: 12,
-    width: 100,
+  pillCount: {
+    fontSize: 12,
+    opacity: 0.7,
+  },
+  pillButtonsContainer: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  pillButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
+    justifyContent: "center",
   },
-  addPillIcon: {
-    marginBottom: 4,
+  intakeNumber: {
+    position: "absolute",
+    bottom: 2,
+    fontSize: 10,
+    fontWeight: "500",
   },
-  addPillText: {
-    fontSize: 14,
+  addButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "flex-end",
   },
 });

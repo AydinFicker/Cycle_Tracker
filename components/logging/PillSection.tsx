@@ -10,6 +10,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { PillSettingsModal } from "../modals/PillSettingsModal";
+import { PillListModal } from "../modals/PillListModal";
 
 export interface Pill {
   id: string;
@@ -28,19 +29,30 @@ interface PillSectionProps {
     reminderTimes: (string | null)[];
   }) => void;
   onPillTake: (pillId: string) => void;
+  onPillsUpdate: (updatedPills: Pill[]) => void;
 }
 
 export const PillSection: React.FC<PillSectionProps> = ({
   pills,
   onPillAdd,
   onPillTake,
+  onPillsUpdate,
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isSettingsModalVisible, setIsSettingsModalVisible] = useState(false);
+  const [isListModalVisible, setIsListModalVisible] = useState(false);
+  const [selectedPill, setSelectedPill] = useState<Pill | null>(null);
 
   const handleAddPill = () => {
-    setIsModalVisible(true);
+    setSelectedPill(null);
+    setIsSettingsModalVisible(true);
+  };
+
+  const handleEditPill = (pill: Pill) => {
+    setSelectedPill(pill);
+    setIsSettingsModalVisible(true);
+    setIsListModalVisible(false); // Close list modal when editing
   };
 
   const handlePillSubmit = (pillData: {
@@ -48,15 +60,49 @@ export const PillSection: React.FC<PillSectionProps> = ({
     intakes: number;
     reminderTimes: (string | null)[];
   }) => {
-    onPillAdd(pillData);
-    setIsModalVisible(false);
+    if (selectedPill) {
+      // Update all pills with the same base name
+      const baseName = selectedPill.name;
+      const updatedPills = pills.map((pill) => {
+        if (pill.name === baseName) {
+          return {
+            ...pill,
+            name: pillData.name,
+            intakes: pillData.intakes,
+            reminderTimes: pillData.reminderTimes,
+          };
+        }
+        return pill;
+      });
+      onPillsUpdate(updatedPills);
+    } else {
+      onPillAdd(pillData);
+    }
+    setIsSettingsModalVisible(false);
+    setSelectedPill(null);
   };
 
   const handlePillPress = (pillId: string) => {
     const pill = pills.find((p) => p.id === pillId);
     if (!pill) return;
 
-    onPillTake(pillId);
+    if (pill.reminderTimes.some((time) => time !== null)) {
+      onPillTake(pillId);
+    } else {
+      setSelectedPill(pill);
+      setIsSettingsModalVisible(true);
+    }
+  };
+
+  const handlePillDelete = (pillName: string) => {
+    const updatedPills = pills.filter((pill) => pill.name !== pillName);
+    onPillsUpdate(updatedPills);
+    setIsSettingsModalVisible(false);
+    setSelectedPill(null);
+  };
+
+  const handlePillsReorder = (reorderedPills: Pill[]) => {
+    onPillsUpdate(reorderedPills);
   };
 
   const groupedPills = pills.reduce<{ [key: string]: Pill[] }>((acc, pill) => {
@@ -77,6 +123,17 @@ export const PillSection: React.FC<PillSectionProps> = ({
           <View style={styles.titleContainer}>
             <Ionicons name="medical" size={24} color={theme.red} />
             <ThemedText style={styles.title}>Pills</ThemedText>
+          </View>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity
+              onPress={() => setIsListModalVisible(true)}
+              style={styles.iconButton}
+            >
+              <Ionicons name="settings-outline" size={24} color={theme.text} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleAddPill} style={styles.iconButton}>
+              <Ionicons name="add" size={24} color={theme.text} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -120,22 +177,34 @@ export const PillSection: React.FC<PillSectionProps> = ({
               </View>
             </View>
           ))}
-
-          <TouchableOpacity
-            style={[
-              styles.addButton,
-              { backgroundColor: theme.buttonBackground },
-            ]}
-            onPress={handleAddPill}
-          >
-            <Ionicons name="add" size={24} color={theme.text} />
-          </TouchableOpacity>
         </ScrollView>
 
         <PillSettingsModal
-          isVisible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
+          isVisible={isSettingsModalVisible}
+          onClose={() => {
+            setIsSettingsModalVisible(false);
+            setSelectedPill(null);
+          }}
           onSubmit={handlePillSubmit}
+          onDelete={selectedPill ? handlePillDelete : undefined}
+          initialValues={
+            selectedPill
+              ? {
+                  name: selectedPill.name,
+                  intakes: selectedPill.intakes,
+                  reminderTimes: selectedPill.reminderTimes,
+                }
+              : undefined
+          }
+        />
+
+        <PillListModal
+          isVisible={isListModalVisible}
+          onClose={() => setIsListModalVisible(false)}
+          pills={pills}
+          onPillEdit={handleEditPill}
+          onPillDelete={handlePillDelete}
+          onPillsReorder={handlePillsReorder}
         />
       </View>
     </View>
@@ -163,6 +232,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
+  },
+  headerButtons: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  iconButton: {
+    padding: 4,
   },
   titleContainer: {
     flexDirection: "row",

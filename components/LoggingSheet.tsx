@@ -371,6 +371,7 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
                         pills={pills}
                         onPillAdd={handlePillAdd}
                         onPillTake={handlePillTake}
+                        onPillsUpdate={setPills}
                       />
                       <WaterSection
                         waterAmount={

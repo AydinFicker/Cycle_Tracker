@@ -9,6 +9,13 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+
+// Configure Reanimated logger to be less strict
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.error, // Only show errors, not warnings
+  strict: false, // Disable strict mode
+});
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 

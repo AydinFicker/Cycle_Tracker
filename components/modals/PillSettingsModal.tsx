@@ -27,24 +27,45 @@ interface PillSettingsModalProps {
     intakes: number;
     reminderTimes: (string | null)[];
   }) => void;
+  onDelete?: (pillName: string) => void;
+  initialValues?: {
+    name: string;
+    intakes: number;
+    reminderTimes: (string | null)[];
+  };
 }
 
 export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
   isVisible,
   onClose,
   onSubmit,
+  onDelete,
+  initialValues,
 }) => {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
 
-  const [name, setName] = useState("");
-  const [intakes, setIntakes] = useState(1);
-  const [reminderTimes, setReminderTimes] = useState<(string | null)[]>([
-    "12:00",
-  ]);
+  const [name, setName] = useState(initialValues?.name ?? "");
+  const [intakes, setIntakes] = useState(initialValues?.intakes ?? 1);
+  const [reminderTimes, setReminderTimes] = useState<(string | null)[]>(
+    initialValues?.reminderTimes ?? [null]
+  );
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTimeIndex, setSelectedTimeIndex] = useState<number>(0);
   const [remindersEnabled, setRemindersEnabled] = useState(true);
+
+  // Reset state when initialValues changes
+  useEffect(() => {
+    if (initialValues) {
+      setName(initialValues.name);
+      setIntakes(initialValues.intakes);
+      setReminderTimes(initialValues.reminderTimes);
+    } else {
+      setName("");
+      setIntakes(1);
+      setReminderTimes([null]);
+    }
+  }, [initialValues]);
 
   // Update reminder times array when intakes change
   useEffect(() => {
@@ -130,7 +151,6 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
             { backgroundColor: theme.modalBackground },
           ]}
         >
-          {/* Header */}
           <View style={styles.header}>
             <SmallTextButton onPress={onClose}>
               <ThemedText style={[styles.cancelText, { color: theme.red }]}>
@@ -138,7 +158,7 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
               </ThemedText>
             </SmallTextButton>
             <ThemedText type="title" style={styles.title}>
-              Add Pill
+              {initialValues ? "Edit Pill" : "Add Pill"}
             </ThemedText>
             <View style={styles.placeholder} />
           </View>
@@ -258,15 +278,28 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
             </View>
           </ScrollView>
 
-          {/* Save Button */}
-          <DefaultButton
-            onPress={handleSave}
-            defaultColor={theme.yellow}
-            defaultTextColor={theme.white}
-            style={styles.saveButton}
-          >
-            Add Pill
-          </DefaultButton>
+          <View style={styles.buttonContainer}>
+            {onDelete && (
+              <DefaultButton
+                onPress={() => {
+                  onDelete(name);
+                }}
+                defaultColor={theme.red}
+                defaultTextColor={theme.white}
+                style={styles.deleteButton}
+              >
+                Delete Pill
+              </DefaultButton>
+            )}
+            <DefaultButton
+              onPress={handleSave}
+              defaultColor={theme.yellow}
+              defaultTextColor={theme.white}
+              style={styles.saveButton}
+            >
+              {initialValues ? "Save Changes" : "Add Pill"}
+            </DefaultButton>
+          </View>
 
           {/* Time Picker */}
           {showTimePicker && Platform.OS === "ios" && (
@@ -394,8 +427,15 @@ const styles = StyleSheet.create({
     borderColor: Colors.light.blue,
     borderStyle: "dashed",
   },
-  saveButton: {
+  buttonContainer: {
+    gap: 12,
     marginTop: 20,
+  },
+  deleteButton: {
+    marginTop: 8,
+  },
+  saveButton: {
+    marginBottom: 20,
   },
   timePickerContainer: {
     position: "absolute",

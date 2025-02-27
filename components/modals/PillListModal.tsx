@@ -174,7 +174,7 @@ export const PillListModal: React.FC<PillListModalProps> = ({
     <Modal
       visible={isVisible}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>

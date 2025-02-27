@@ -282,7 +282,7 @@ export const PillListModal: React.FC<PillListModalProps> = ({
     <Modal
       visible={isVisible}
       transparent
-      animationType="slide"
+      animationType="fade"
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
@@ -294,15 +294,17 @@ export const PillListModal: React.FC<PillListModalProps> = ({
         >
           {/* Header */}
           <View style={styles.header}>
-            <SmallTextButton onPress={onClose}>
-              <ThemedText style={[styles.headerText, { color: theme.red }]}>
-                Cancel
-              </ThemedText>
-            </SmallTextButton>
+            <View style={styles.headerLeftButton}>
+              <SmallTextButton onPress={onClose}>
+                <ThemedText style={[styles.headerText, { color: theme.red }]}>
+                  Cancel
+                </ThemedText>
+              </SmallTextButton>
+            </View>
             <ThemedText type="title" style={styles.title}>
               Reorder Pills
             </ThemedText>
-            <View style={styles.placeholder} />
+            <View style={styles.headerRightPlaceholder} />
           </View>
 
           {noPills ? (
@@ -372,11 +374,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 16,
   },
+  headerLeftButton: {
+    width: 100,
+    alignItems: "flex-start",
+  },
+  headerRightPlaceholder: {
+    width: 100,
+  },
   headerText: {
     fontSize: 16,
   },
   title: {
     fontSize: 18,
+    textAlign: "center",
+    flex: 1,
   },
   instructions: {
     textAlign: "center",

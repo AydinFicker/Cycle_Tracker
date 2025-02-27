@@ -152,15 +152,17 @@ export const PillSettingsModal: React.FC<PillSettingsModalProps> = ({
           ]}
         >
           <View style={styles.header}>
-            <SmallTextButton onPress={onClose}>
-              <ThemedText style={[styles.cancelText, { color: theme.red }]}>
-                Cancel
-              </ThemedText>
-            </SmallTextButton>
+            <View style={styles.headerLeftButton}>
+              <SmallTextButton onPress={onClose}>
+                <ThemedText style={[styles.cancelText, { color: theme.red }]}>
+                  Cancel
+                </ThemedText>
+              </SmallTextButton>
+            </View>
             <ThemedText type="title" style={styles.title}>
               {initialValues ? "Edit Pill" : "Add Pill"}
             </ThemedText>
-            <View style={styles.placeholder} />
+            <View style={styles.headerRightPlaceholder} />
           </View>
 
           <ScrollView>
@@ -354,20 +356,26 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    alignItems: "center",
+    paddingHorizontal: 0,
+    marginBottom: 16,
+  },
+  headerLeftButton: {
+    width: 100,
+    alignItems: "flex-start",
+  },
+  headerRightPlaceholder: {
+    width: 100,
   },
   title: {
     textAlign: "center",
     fontSize: 20,
+    flex: 1,
   },
   cancelText: {
     fontSize: 16,
     fontWeight: "500",
-  },
-  placeholder: {
-    width: 50,
   },
   inputSection: {
     marginBottom: 20,

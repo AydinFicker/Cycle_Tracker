@@ -39,12 +39,14 @@ interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
   onClose: () => void;
   initialDate?: Date;
+  onChange?: (index: number) => void;
 }
 
 export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   bottomSheetRef,
   onClose,
   initialDate,
+  onChange,
 }) => {
   const navigation = useNavigation();
   const colorScheme = useColorScheme() ?? "light";
@@ -280,7 +282,10 @@ export const LoggingSheet: React.FC<LoggingSheetProps> = ({
         ref={bottomSheetRef}
         index={-1}
         snapPoints={snapPoints}
-        onChange={handleSheetChange}
+        onChange={(index) => {
+          handleSheetChange(index);
+          onChange?.(index);
+        }}
         onAnimate={handleSheetAnimate}
         enablePanDownToClose
         backdropComponent={renderBackdrop}

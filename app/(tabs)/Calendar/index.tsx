@@ -31,6 +31,89 @@ type MarkedDates = {
 
 type ThemeColor = keyof (typeof Colors)["light"];
 
+// Component for the Calendar content
+const CalendarContent = ({
+  theme,
+  screenWidth,
+  markedDates,
+  onDayPress,
+  onAddInfoPress,
+}: {
+  theme: any;
+  screenWidth: number;
+  markedDates: MarkedDates;
+  onDayPress: (day: DateData) => void;
+  onAddInfoPress: () => void;
+}) => (
+  <View style={styles.content}>
+    <CalendarList
+      horizontal={false}
+      calendarWidth={screenWidth - 40}
+      pastScrollRange={12}
+      futureScrollRange={12}
+      markingType={"period"}
+      markedDates={markedDates}
+      onDayPress={onDayPress}
+      theme={{
+        backgroundColor: "transparent",
+        calendarBackground: "transparent",
+        textSectionTitleColor: theme.text,
+        dayTextColor: theme.text,
+        monthTextColor: theme.text,
+        textDisabledColor: theme.darkgrey,
+        selectedDayBackgroundColor: "transparent",
+        selectedDayTextColor: theme.text,
+        todayTextColor: theme.yellow40,
+        todayBackgroundColor: "transparent",
+        arrowColor: theme.text,
+        textDayFontSize: 16,
+        textMonthFontSize: 16,
+        textDayHeaderFontSize: 14,
+        textSectionTitleDisabledColor: theme.darkgrey,
+        textDayStyle: { color: theme.text },
+        textMonthFontWeight: "bold",
+        textDayFontWeight: "400",
+        textDayHeaderFontWeight: "400",
+      }}
+      style={styles.calendar}
+    />
+
+    <View style={styles.legendContainer}>
+      <CircleLegend color={theme.yellow40}>Today</CircleLegend>
+      <CircleLegend color={theme.red40}>Period</CircleLegend>
+      <CircleLegend color={theme.blue40}>Ovulation</CircleLegend>
+    </View>
+
+    <View style={styles.buttonContainer}>
+      <ThickIconDefaultButton
+        onPress={onAddInfoPress}
+        icon={<Ionicons name="pencil" size={24} color={theme.white} />}
+        defaultColor={theme.yellow}
+        defaultTextColor={theme.white}
+        style={styles.leftButton}
+      >
+        Log Today's{"\n"}Symptoms
+      </ThickIconDefaultButton>
+
+      <ThickIconDefaultButton
+        onPress={() => {
+          // Set a subtitle explaining how to view previous logs
+          Alert.alert(
+            "View Previous Logs",
+            "Simply tap on any date in the calendar above to view its log."
+          );
+        }}
+        icon={<Ionicons name="search" size={24} color={theme.white} />}
+        defaultColor={theme.blue}
+        defaultTextColor={theme.white}
+        style={styles.rightButton}
+      >
+        Look Up a{"\n"}Previous Log
+      </ThickIconDefaultButton>
+    </View>
+  </View>
+);
+
 export default function CalendarScreen() {
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
@@ -39,6 +122,7 @@ export default function CalendarScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -99,7 +183,8 @@ export default function CalendarScreen() {
               height: 0,
             },
           });
-          bottomSheetRef.current.snapToIndex(1);
+          setIsSheetOpen(true);
+          bottomSheetRef.current.snapToIndex(0);
         } catch (error) {
           console.log("Error snapping to index:", error);
           navigation.getParent()?.setOptions({
@@ -130,7 +215,8 @@ export default function CalendarScreen() {
             height: 0,
           },
         });
-        bottomSheetRef.current.snapToIndex(0);
+        setIsSheetOpen(true);
+        bottomSheetRef.current.snapToIndex(1);
       } catch (error) {
         console.log("Error snapping to index:", error);
         navigation.getParent()?.setOptions({
@@ -144,6 +230,7 @@ export default function CalendarScreen() {
   const handleSheetClose = useCallback(() => {
     if (bottomSheetRef.current) {
       try {
+        setIsSheetOpen(false);
         bottomSheetRef.current.close();
       } catch (error) {
         console.log("Error closing sheet:", error);
@@ -151,83 +238,32 @@ export default function CalendarScreen() {
     }
   }, []);
 
+  // Handler for sheet state changes
+  const handleSheetChange = useCallback((index: number) => {
+    setIsSheetOpen(index !== -1);
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemedView style={styles.container}>
         <CalendarIndexBackground />
         <Header title="Calendar" showBackButton={false} />
-        <View style={styles.content}>
-          <CalendarList
-            horizontal={false}
-            calendarWidth={screenWidth - 40}
-            pastScrollRange={12}
-            futureScrollRange={12}
-            markingType={"period"}
+
+        {!isSheetOpen && (
+          <CalendarContent
+            theme={theme}
+            screenWidth={screenWidth}
             markedDates={markedDates}
             onDayPress={handleDayPress}
-            theme={{
-              backgroundColor: "transparent",
-              calendarBackground: "transparent",
-              textSectionTitleColor: theme.text,
-              dayTextColor: theme.text,
-              monthTextColor: theme.text,
-              textDisabledColor: theme.darkgrey,
-              selectedDayBackgroundColor: "transparent",
-              selectedDayTextColor: theme.text,
-              todayTextColor: theme.yellow40,
-              todayBackgroundColor: "transparent",
-              arrowColor: theme.text,
-              textDayFontSize: 16,
-              textMonthFontSize: 16,
-              textDayHeaderFontSize: 14,
-              textSectionTitleDisabledColor: theme.darkgrey,
-              textDayStyle: { color: theme.text },
-              textMonthFontWeight: "bold",
-              textDayFontWeight: "400",
-              textDayHeaderFontWeight: "400",
-            }}
-            style={styles.calendar}
+            onAddInfoPress={handleAddInfoPress}
           />
-
-          <View style={styles.legendContainer}>
-            <CircleLegend color={theme.yellow40}>Today</CircleLegend>
-            <CircleLegend color={theme.red40}>Period</CircleLegend>
-            <CircleLegend color={theme.blue40}>Ovulation</CircleLegend>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <ThickIconDefaultButton
-              onPress={handleAddInfoPress}
-              icon={<Ionicons name="pencil" size={24} color={theme.white} />}
-              defaultColor={theme.yellow}
-              defaultTextColor={theme.white}
-              style={styles.leftButton}
-            >
-              Log Today's{"\n"}Symptoms
-            </ThickIconDefaultButton>
-
-            <ThickIconDefaultButton
-              onPress={() => {
-                // Set a subtitle explaining how to view previous logs
-                Alert.alert(
-                  "View Previous Logs",
-                  "Simply tap on any date in the calendar above to view its log."
-                );
-              }}
-              icon={<Ionicons name="search" size={24} color={theme.white} />}
-              defaultColor={theme.blue}
-              defaultTextColor={theme.white}
-              style={styles.rightButton}
-            >
-              Look Up a{"\n"}Previous Log
-            </ThickIconDefaultButton>
-          </View>
-        </View>
+        )}
 
         <LoggingSheet
           bottomSheetRef={bottomSheetRef}
           onClose={handleSheetClose}
           initialDate={selectedDate || undefined}
+          onChange={handleSheetChange}
         />
       </ThemedView>
     </GestureHandlerRootView>

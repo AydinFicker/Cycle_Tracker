@@ -67,8 +67,7 @@ export default function CalendarScreen() {
     console.log("selected day", day);
   };
 
-  // Handler for opening the logging sheet
-  const handleLogSymptomsPress = useCallback(() => {
+  const handleAddInfoPress = useCallback(() => {
     if (bottomSheetRef.current) {
       try {
         // Hide tab bar immediately with aggressive positioning
@@ -150,7 +149,7 @@ export default function CalendarScreen() {
 
           <View style={styles.buttonContainer}>
             <ThickIconDefaultButton
-              onPress={handleLogSymptomsPress}
+              onPress={handleAddInfoPress}
               icon={<Ionicons name="pencil" size={24} color={theme.white} />}
               defaultColor={theme.yellow}
               defaultTextColor={theme.white}

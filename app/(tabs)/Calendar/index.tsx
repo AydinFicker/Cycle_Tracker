@@ -19,6 +19,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useCallback, useRef, useState } from "react";
 import { LoggingSheet } from "@/components/LoggingSheet";
+import { DatePickerModal } from "@/components/modals/DatePickerModal";
 
 type MarkedDates = {
   [date: string]: {
@@ -38,12 +39,14 @@ const CalendarContent = ({
   markedDates,
   onDayPress,
   onAddInfoPress,
+  onLookupPress,
 }: {
   theme: any;
   screenWidth: number;
   markedDates: MarkedDates;
   onDayPress: (day: DateData) => void;
   onAddInfoPress: () => void;
+  onLookupPress: () => void;
 }) => (
   <View style={styles.content}>
     <CalendarList
@@ -96,13 +99,7 @@ const CalendarContent = ({
       </ThickIconDefaultButton>
 
       <ThickIconDefaultButton
-        onPress={() => {
-          // Set a subtitle explaining how to view previous logs
-          Alert.alert(
-            "View Previous Logs",
-            "Simply tap on any date in the calendar above to view its log."
-          );
-        }}
+        onPress={onLookupPress}
         icon={<Ionicons name="search" size={24} color={theme.white} />}
         defaultColor={theme.blue}
         defaultTextColor={theme.white}
@@ -123,6 +120,7 @@ export default function CalendarScreen() {
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -184,7 +182,7 @@ export default function CalendarScreen() {
             },
           });
           setIsSheetOpen(true);
-          bottomSheetRef.current.snapToIndex(0);
+          bottomSheetRef.current.snapToIndex(1);
         } catch (error) {
           console.log("Error snapping to index:", error);
           navigation.getParent()?.setOptions({
@@ -216,7 +214,7 @@ export default function CalendarScreen() {
           },
         });
         setIsSheetOpen(true);
-        bottomSheetRef.current.snapToIndex(1);
+        bottomSheetRef.current.snapToIndex(0);
       } catch (error) {
         console.log("Error snapping to index:", error);
         navigation.getParent()?.setOptions({
@@ -225,6 +223,41 @@ export default function CalendarScreen() {
       }
     }
   }, [navigation]);
+
+  const handleLookupPress = useCallback(() => {
+    setIsDatePickerVisible(true);
+  }, []);
+
+  const handleDateSelect = useCallback(
+    (date: Date) => {
+      setSelectedDate(date);
+
+      if (bottomSheetRef.current) {
+        try {
+          // Hide tab bar immediately with aggressive positioning
+          navigation.getParent()?.setOptions({
+            tabBarStyle: {
+              position: "absolute",
+              bottom: -1000,
+              left: 0,
+              right: 0,
+              zIndex: -1,
+              opacity: 0,
+              height: 0,
+            },
+          });
+          setIsSheetOpen(true);
+          bottomSheetRef.current.snapToIndex(0);
+        } catch (error) {
+          console.log("Error snapping to index:", error);
+          navigation.getParent()?.setOptions({
+            tabBarStyle: undefined,
+          });
+        }
+      }
+    },
+    [navigation]
+  );
 
   // Handler for closing the sheet
   const handleSheetClose = useCallback(() => {
@@ -256,6 +289,7 @@ export default function CalendarScreen() {
             markedDates={markedDates}
             onDayPress={handleDayPress}
             onAddInfoPress={handleAddInfoPress}
+            onLookupPress={handleLookupPress}
           />
         )}
 
@@ -264,6 +298,13 @@ export default function CalendarScreen() {
           onClose={handleSheetClose}
           initialDate={selectedDate || undefined}
           onChange={handleSheetChange}
+        />
+
+        <DatePickerModal
+          isVisible={isDatePickerVisible}
+          onClose={() => setIsDatePickerVisible(false)}
+          onDateSelect={handleDateSelect}
+          maxDate={new Date()} // Don't allow future dates
         />
       </ThemedView>
     </GestureHandlerRootView>

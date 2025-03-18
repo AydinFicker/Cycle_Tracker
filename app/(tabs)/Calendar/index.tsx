@@ -1,4 +1,10 @@
-import { StyleSheet, View, useColorScheme, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  useColorScheme,
+  Dimensions,
+  Alert,
+} from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { CalendarList, DateData } from "react-native-calendars";
@@ -11,7 +17,7 @@ import { CalendarIndexBackground } from "@/components/backgrounds/CalendarIndexB
 import { CYCLE_DATA } from "@/constants/CycleData";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { LoggingSheet } from "@/components/LoggingSheet";
 
 type MarkedDates = {
@@ -32,6 +38,7 @@ export default function CalendarScreen() {
   const { currentCycle } = CYCLE_DATA;
   const bottomSheetRef = useRef<BottomSheet>(null);
   const navigation = useNavigation();
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -63,11 +70,52 @@ export default function CalendarScreen() {
     };
   }
 
-  const handleDayPress = (day: DateData) => {
-    console.log("selected day", day);
-  };
+  const handleDayPress = useCallback(
+    (day: DateData) => {
+      console.log("selected day", day);
+      const date = new Date(day.dateString);
+
+      if (date > new Date()) {
+        Alert.alert(
+          "Cannot select future dates",
+          "Please select today or a past date."
+        );
+        return;
+      }
+
+      setSelectedDate(date);
+
+      if (bottomSheetRef.current) {
+        try {
+          // Hide tab bar immediately with aggressive positioning
+          navigation.getParent()?.setOptions({
+            tabBarStyle: {
+              position: "absolute",
+              bottom: -1000,
+              left: 0,
+              right: 0,
+              zIndex: -1,
+              opacity: 0,
+              height: 0,
+            },
+          });
+          bottomSheetRef.current.snapToIndex(1);
+        } catch (error) {
+          console.log("Error snapping to index:", error);
+          navigation.getParent()?.setOptions({
+            tabBarStyle: undefined,
+          });
+        }
+      }
+    },
+    [navigation]
+  );
 
   const handleAddInfoPress = useCallback(() => {
+    // Set selected date to today
+    const today = new Date();
+    setSelectedDate(today);
+
     if (bottomSheetRef.current) {
       try {
         // Hide tab bar immediately with aggressive positioning
@@ -82,7 +130,7 @@ export default function CalendarScreen() {
             height: 0,
           },
         });
-        bottomSheetRef.current.snapToIndex(1);
+        bottomSheetRef.current.snapToIndex(0);
       } catch (error) {
         console.log("Error snapping to index:", error);
         navigation.getParent()?.setOptions({
@@ -159,7 +207,13 @@ export default function CalendarScreen() {
             </ThickIconDefaultButton>
 
             <ThickIconDefaultButton
-              onPress={() => router.push("/(tabs)")}
+              onPress={() => {
+                // Set a subtitle explaining how to view previous logs
+                Alert.alert(
+                  "View Previous Logs",
+                  "Simply tap on any date in the calendar above to view its log."
+                );
+              }}
               icon={<Ionicons name="search" size={24} color={theme.white} />}
               defaultColor={theme.blue}
               defaultTextColor={theme.white}
@@ -173,6 +227,7 @@ export default function CalendarScreen() {
         <LoggingSheet
           bottomSheetRef={bottomSheetRef}
           onClose={handleSheetClose}
+          initialDate={selectedDate || undefined}
         />
       </ThemedView>
     </GestureHandlerRootView>

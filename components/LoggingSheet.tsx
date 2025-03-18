@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import {
   View,
   StyleSheet,
@@ -32,22 +38,32 @@ import { PillSection, Pill } from "./logging/PillSection";
 interface LoggingSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet>;
   onClose: () => void;
+  initialDate?: Date;
 }
 
 export const LoggingSheet: React.FC<LoggingSheetProps> = ({
   bottomSheetRef,
   onClose,
+  initialDate,
 }) => {
   const navigation = useNavigation();
   const colorScheme = useColorScheme() ?? "light";
   const theme = Colors[colorScheme];
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(initialDate || new Date());
   const [loggingData, setLoggingData] = useState<LoggingData>({});
   const [searchQuery, setSearchQuery] = useState("");
   const insets = useSafeAreaInsets();
   const [isOvulationTestModalVisible, setIsOvulationTestModalVisible] =
     useState(false);
   const [pills, setPills] = useState<Pill[]>([]);
+
+  // Add useEffect to update selectedDate when initialDate changes
+  useEffect(() => {
+    if (initialDate) {
+      setSelectedDate(initialDate);
+      setLoggingData({}); // Clear data when date changes
+    }
+  }, [initialDate]);
 
   // Format the selected date for display
   const formattedDate = useMemo(() => {
